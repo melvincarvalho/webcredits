@@ -16,8 +16,10 @@ var https     = require('https');
 
 
 var host = 'wss://klaranet.com:443/';
-var root = 'https://klaranet.com/d/user/5edbedfea2005c9feca6c014a6d8b2237d1e54c4113155621e2d7ecb7427c42b/';
+var root = 'https://klaranet.com/d/user/';
 var sub  = root + ',meta';
+var subs = [];
+subs.push(sub);
 var ws   = new WebSocket(host);
 
 
@@ -61,14 +63,24 @@ var f = $rdf.fetcher(g, TIMEOUT);
 console.log(ws);
 
 ws.on('open', function() {
-  ws.send('sub ' + sub);
+
+  f.requestURI(root,undefined,true, function(ok, body, xhr) {
+    console.log('tx fetched');
+
+    var x = g.statementsMatching($rdf.sym(root), LDP("contains"));
+    for (var i=0; i<x.length; i++) {
+      var sub = 'sub ' + x[i].object.uri + ',meta';
+      console.log(sub);
+      ws.send( sub );
+    }
+  });
 });
 
 ws.on('message', function(message) {
   console.log('received: %s', message);
 
 
-
+  root = message.split(' ')[1].split(',')[0];
 
 
   var g = $rdf.graph();
