@@ -142,6 +142,13 @@ ws.on('message', function(message) {
             req.write('');
             req.end();
 
+            options.method = 'PUT';
+            console.log(options);
+            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-1 ).join('/') + '/,meta';
+            var req = https.request(options, callback);
+            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
+            req.end();
+
           });
 
 
@@ -175,6 +182,14 @@ ws.on('message', function(message) {
             var req = https.request(options, callback);
             //This is the data we are posting, it needs to be a string or a buffer
             req.write('');
+            req.end();
+
+
+            options.method = 'PUT';
+            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-1 ).join('/') + '/,meta';
+            console.log(options);
+            var req = https.request(options, callback);
+            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
             req.end();
 
           });
