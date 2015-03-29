@@ -2,7 +2,7 @@ var WebSocket = require('ws');
 var exec      = require('child_process').exec;
 var $rdf      = require('rdflib');
 var https     = require('https');
-
+var sha256    = require('sha256');
 
 
 
@@ -143,8 +143,17 @@ ws.on('message', function(message) {
             req.end();
 
             options.method = 'PUT';
+            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+            + '/' + sha256(t[0]) + '/,meta';
             console.log(options);
-            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-1 ).join('/') + '/,meta';
+            var req = https.request(options, callback);
+            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
+            req.end();
+
+            options.method = 'PUT';
+            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+            + '/' + sha256(t[3]) + '/,meta';
+            console.log(options);
             var req = https.request(options, callback);
             req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
             req.end();
@@ -186,7 +195,16 @@ ws.on('message', function(message) {
 
 
             options.method = 'PUT';
-            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-1 ).join('/') + '/,meta';
+            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+            + '/' + sha256(t[0]) + '/,meta';
+            console.log(options);
+            var req = https.request(options, callback);
+            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
+            req.end();
+
+            options.method = 'PUT';
+            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+            + '/' + sha256(t[3]) + '/,meta';
             console.log(options);
             var req = https.request(options, callback);
             req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
