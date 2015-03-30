@@ -1,0 +1,12 @@
+RewriteEngine on 
+
+Options +FollowSymLinks
+RewriteRule ^/?recent$ recent.php [L]
+RewriteRule ^/?top$ top.php [L]
+RewriteRule ^/?balance$ balance.php [L]
+RewriteRule ^/?today$ today.php [L]
+RewriteRule ^/?twitter$ twitter.php [L]
+RewriteRule ^/?tx$ tx.php [L]
+
+RewriteRule ^/?.well-known\/ni/sha-256/(.*)$ recent.php?id=ni:///sha-256;$1 [L]
+
