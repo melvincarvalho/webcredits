@@ -4,32 +4,22 @@ var $rdf      = require('rdflib');
 var https     = require('https');
 var sha256    = require('sha256');
 
+var port   = 443;
+var ldpc   = process.argv[2] || 'https://klaranet.com/d/user/';
+var domain = ldpc.split('/')[2];
+var wss    = 'wss://'+domain+':'+port+'/';
+var sub    = ldpc + ',meta';
+var subs   = [];
 
+console.log('running webcredits daemon on ' + domain);
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
-
-
-
-
-
-
-
-
-
-var host = 'wss://klaranet.com:443/';
-var root = 'https://klaranet.com/d/user/';
-var sub  = root + ',meta';
-var subs = [];
 subs.push(sub);
-var ws   = new WebSocket(host);
+var ws    = new WebSocket(wss, null, {rejectUnauthorized: false});
 
-
-
-
-//The url we want is `www.nodejitsu.com:1337/`
 var options = {
-  host: 'klaranet.com',  //since we are listening on a custom port, we need to specify it by hand
-  port: '443',
-  //This is what changes the request to a POST request
+  host: domain,
+  port: port,
   method: 'DELETE'
 };
 
@@ -64,10 +54,14 @@ console.log(ws);
 
 ws.on('open', function() {
 
-  f.requestURI(root,undefined,true, function(ok, body, xhr) {
-    console.log('tx fetched');
+  console.log('fetching user dirs from ' + ldpc);
+  f.requestURI(ldpc,undefined,true, function(ok, body, xhr) {
+    console.log('container fetched');
 
-    var x = g.statementsMatching($rdf.sym(root), LDP("contains"));
+
+    var x = g.statementsMatching($rdf.sym(ldpc), LDP("contains"));
+
+
     for (var i=0; i<x.length; i++) {
       var sub = 'sub ' + x[i].object.uri + ',meta';
       console.log(sub);
@@ -76,21 +70,26 @@ ws.on('open', function() {
   });
 });
 
+
+
+
 ws.on('message', function(message) {
   console.log('received: %s', message);
 
 
-  root = message.split(' ')[1].split(',')[0];
+
+
+  ldpc = message.split(' ')[1].split(',')[0];
 
 
   var g = $rdf.graph();
   var f = $rdf.fetcher(g, TIMEOUT);
 
 
-  f.requestURI(root,undefined,true, function(ok, body, xhr) {
+  f.requestURI(ldpc,undefined,true, function(ok, body, xhr) {
     console.log('tx fetched');
 
-    var x = g.statementsMatching($rdf.sym(root), LDP("contains"));
+    var x = g.statementsMatching($rdf.sym(ldpc), LDP("contains"));
     for (var i=0; i<x.length; i++) {
       var tx = x[i].object.uri;
       if (! (/.*[0-9]+$/).test(tx) ) continue;
@@ -163,7 +162,7 @@ ws.on('message', function(message) {
 
         } else {
 
-          var command = "nodejs /var/www/html/scripts/insert.js '"+t[0]+"' "+t[1]+" '"+t[2]+"' '"+t[3]+"' 'vw'";
+          var command = "nodejs insert.js '"+t[0]+"' "+t[1]+" '"+t[2]+"' '"+t[3]+"' 'vw'";
           console.log(command);
           exec(command, function(error, stdout, stderr) {
             console.log('stdout: ' + stdout);
