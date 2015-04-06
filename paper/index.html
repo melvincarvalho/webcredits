@@ -211,9 +211,9 @@ xml:lang="en" lang="en">
                       <section id="storage" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#storage]">
                         <h3 about="[this:#storage]" property="dcterms:title">Storage</h2>
                         <div about="[this:#storage]" property="dcterms:description">
-                          <p>We use a web powered server to store the initial credits, using HTTP PUT, which is part of the linked data platform.
+                          <p>We use a web powered server written in nodejs, to store the initial credits, using HTTP PUT, which is part of the linked data platform.
                           Once the new credit is put in an agreed container, anothe process monitors the container and will validate, add an UUID to the credit
-                          and send it downsteam for archiving and indexing.</p>
+                          and send it downsteam for archiving and indexing.  For our work we are using the GOLD linked data server.</p>
 
                           The format of the transaction is:
 
@@ -227,9 +227,10 @@ xml:lang="en" lang="en">
 
                             <p>An update to a well known file, ",meta" is also sent by the client in order to let the process know there is a new transaction.</p>
 
-                            <p>The server will then vaildate that all required fields are there, check that the balance is above the amount needed, and add a UUID.
-                            It will also send the message downstream.  In this case we use a single table sqlite database to index processed transactions.  This works
-                            well on small scale, but due to table locking a more robust database, perhaps such as redis, would be used for more transactions.</p>
+                            <p>The server will then vaildate that all required fields are filled in, check that the balance is above the amount needed, and add a UUID.
+                            It will also send the message downstream, deleting the existing tx, using HTTP DELETE.  In this case we use a single table sqlite database
+                            to index processed transactions.  This works well on small scale, but due to table locking a more robust database, perhaps such as redis,
+                            would be used for more transactions.</p>
 
                             <p>When the process is finished, it again updates ",meta" in order to let the client know there was an update.</p>
 
