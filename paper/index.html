@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+xml:lang="en" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Taskify</title>
+  <link rel="stylesheet" media="all" title="LNCS" href="media/css/lncs.css"/>
+  <link rel="stylesheet alternate" media="all" title="ACM" href="media/css/acm.css"/>
+  <link rel="stylesheet alternate" href="http://www.w3.org/StyleSheets/TR/W3C-REC.css" media="all" title="W3C-REC"/>
+  <link rel="stylesheet" media="all" href="media/css/lr.css"/>
+  <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="scripts/html.sortable.min.js"></script>
+  <script src="scripts/lr.js"></script>
+</head>
+
+<body about="http://webcredits.org/paper/" typeof="foaf:Document sioc:Post biblio:Paper prov:Entity" class="hfeed" prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# rdfs: http://www.w3.org/2000/01/rdf-schema# owl: http://www.w3.org/2002/07/owl# xsd: http://www.w3.org/2001/XMLSchema# dcterms: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ v: http://www.w3.org/2006/vcard/ns# pimspace: http://www.w3.org/ns/pim/space# cc: http://creativecommons.org/ns# skos: http://www.w3.org/2004/02/skos/core# prov: http://www.w3.org/ns/prov# schema: http://schema.org/ rsa: http://www.w3.org/ns/auth/rsa# cert: http://www.w3.org/ns/auth/cert# cal: http://www.w3.org/2002/12/cal/ical# wgs: http://www.w3.org/2003/01/geo/wgs84_pos# org: http://www.w3.org/ns/org# biblio: http://purl.org/net/biblio# bibo: http://purl.org/ontology/bibo/ book: http://purl.org/NET/book/vocab# ov: http://open.vocab.org/terms/ doap: http://usefulinc.com/ns/doap# dbr: http://dbpedia.org/resource/ dbp: http://dbpedia.org/property/ sio: http://semanticscience.org/resource/ opmw: http://www.opmw.org/ontology/ deo: http://purl.org/spar/deo/ doco: http://purl.org/spar/doco/ cito: http://purl.org/spar/cito/ fabio: http://purl.org/spar/fabio/ sro: http://salt.semanticauthoring.org/ontologies/sro# this: http://webcredits.org/paper/">
+  <article class="hentry">
+
+    <h1 class="entry-title" property="dcterms:title">Web Credits</h1>
+
+    <div id="authors">
+      <dl id="author-name">
+        <dt>Authors</dt>
+        <dd id="author-1"><span about="http://webcredits.org/paper/" rel="dcterms:creator dcterms:publisher dcterms:contributor"><a about="http://melvincarvalho.com/#me" typeof="foaf:Person" rel="foaf:homepage" property="foaf:name" href="http://melvincarvalho.com/">Melvin Carvalho</a></span><sup><a href="#author-email-1">X</a></sup></dd>
+      </dl>
+
+      <ul id="author-email">
+        <li id="author-email-1"><sup>X</sup><a about="http://melvincarvalho.com/#me" rel="foaf:mbox" href="mailto:melvincarvalho@gmail.com">melvincarvalho@gmail.com</a></li>
+      </ul>
+    </div>
+
+    <dl id="document-identifier">
+      <dt>Document ID</dt>
+      <dd><a href="http://webcredits.org/paper/">http://webcredits.org/paper/</a></dd>
+    </dl>
+
+    <dl id="document-published">
+      <dt>Published</dt>
+      <dd property="dcterms:published" content="2014-12-08T00:00:00Z" datatype="xsd:dateTime">2015-03-24</dd>
+    </dl>
+
+    <dl id="document-modified">
+      <dt>Modified</dt>
+      <dd property="dcterms:modified" content="2014-12-08T00:00:00Z" datatype="xsd:dateTime">2015-03-24</dd>
+    </dl>
+
+    <dl id="document-license">
+      <dt>License</dt>
+      <dd><a about="http://webcredits.org/paper/" rel="license cc:license" href="http://creativecommons.org/licenses/by-sa/4.0/" title="Creative Commons Attribution-ShareAlike 4.0 Unported">CC BY-SA 4.0</a></dd>
+    </dl>
+
+
+
+    <dl id="document-purpose">
+      <dt>Purpose</dt>
+      <dd property="schema:purpose">Linked data based Credits.</dd>
+    </dl>
+
+
+    <div id="content" class="entry-content">
+      <section id="abstract" about="http://webcredits.org/paper/">
+        <h2>Abstract</h2>
+        <div property="dcterms:abstract" class="entry-summary">
+          <p>We present a system of credits powered by linked data.  It can perform simple workflows on its own, but is intended for use in larger workflows.</p>
+          </div>
+        </section>
+
+        <section id="keywords" about="http://webcredits.org/paper/">
+          <h2>Keywords</h2>
+          <div>
+            <ul rel="dcterms:subject">
+              <li><a resource="http://dbpedia.org/resource/Linked_Data" href="http://en.wikipedia.org/wiki/Linked_Data">Linked Data</a></li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="introduction" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#introduction]">
+          <h2 about="[this:#introduction]" property="dcterms:title">Introduction</h2>
+          <div about="[this:#introduction]" property="dcterms:description" typeof="deo:Introduction">
+            <p id="prologue" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#prologue]" typeof="deo:Prologue" property="dcterms:description" rel="cito:parodies" resource="http://dbpedia.org/resource/Where_no_man_has_gone_before">
+              We present credit based system for linked data and the world wide web.  The model is as simple as we could make it allowing a credit between two URIs an amount and a currency.
+              It is intended to be part of a larger workflow, however can be used as stand alone for simple cases.  We also present a simple server that can be used to process, net and
+              aggregate accumulated credits.</span></p>
+
+              <p id="motivation" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#motivation]" typeof="sro:Motivation" property="dcterms:description"></span></p>
+
+              <p></p>
+
+
+            </div>
+          </section>
+
+
+          <section id="requirements" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#requirements]">
+            <h2 about="[this:#requirements]" property="dcterms:title">Non-Functional Requirements</h2>
+            <div about="[this:#requirements]" property="dcterms:description">
+
+              <section id="decentralization" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#decentralization]">
+                <h3 about="[this:#decentralization]" property="dcterms:title">Decentralization</h3>
+                <div about="[this:#decentralization]" property="dcterms:description">
+                  <p>As much of the system as possible should be decentralized.  This includes, identity, accounts, credits, wallets and messaging.  This
+                  is achieved by giving anything of note a URI.  That allows any domain to host any aspect of the system.  The app is 100% client side and only relies
+                  on commodoty storage as a backend, via linked data platform.</p>
+            </div>
+          </section>
+
+          <section id="accessibility" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#accessibility]">
+            <h3 about="[this:#accessibility]" property="dcterms:title">Accessibility</h3>
+            <div about="[this:#accessibility]" property="dcterms:description">
+              <p>Accessiblity and ARIA guidelines are a goal of the project, so that as many people and possible can use wallets</p>
+        </div>
+      </section>
+
+
+  <section id="standards" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#standards]">
+    <h3 about="[this:#standards]" property="dcterms:title">Web Standards</h3>
+    <div about="[this:#standards]" property="dcterms:description">
+      <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are W3C Design Issues, WebID, Linked Data, Linked Data Platform,
+      HTML5, RESTful principles and Websockets.</p>
+
+</div>
+</section>
+
+
+<section id="security" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#security]">
+  <h3 about="[this:#security]" property="dcterms:title">Security</h3>
+  <div about="[this:#security]" property="dcterms:description">
+    <p>Work is done on security, in particular the tools used are Web Access Control, and TLS.  More tools will be added over time.</p>
+
+</div>
+</section>
+
+
+</div>
+</section>
+
+
+<section id="conceptual-design" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conceptual-design]">
+  <h2 about="[this:#conceptual-design]" property="dcterms:title">Conceptual Design</h2>
+  <div about="[this:#conceptual-design]" property="dcterms:description">
+    <p>The system deals with discovery of information, from user, to workspace, to appication specific data storage.  It deals with showing task boards and tasks using HTTP GET,
+    with updating tasks and task boards, using HTTP PUT/POST.  The system also provides a mechanism for realtime notifications using websockets.</p>
+
+  </div>
+
+
+  <section id="discovery" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#discovery]">
+    <h3 about="[this:#discovery]" property="dcterms:title">Discovery</h3>
+    <div about="[this:#discovery]" property="dcterms:description">
+      <p>Discovery is the act of following a pointer or string in order to establish more information.  The primary technicque, for discovery, is
+      "Follow You Nose", dereferencing the identifier, usually using HTTP and finding out more information.  As a temporary or fallback measure well known locations
+      can be used, or search engines, to augment follow your nose.</p>
+
+</div>
+</section>
+
+
+
+
+
+
+            </section>
+
+
+            <section id="components" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#components]">
+              <h2 about="[this:#components]" property="dcterms:title">Components</h2>
+              <div about="[this:#components]" property="dcterms:description">
+                <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are W3C Design Issues, WebID, Linked Data, Linked Data Platform,
+                HTML5, RESTful principles and Websockets</p>
+
+                <section id="WebID" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#WebID]">
+                  <h3 about="[this:#WebID]" property="dcterms:title">WebID</h3>
+                  <div about="[this:#WebID]" property="dcterms:description">
+                    <p>WebID will be used for Identity.  A WebID is an HTTP URI that denotes an Agent.  Hash URIs are preferred.  The system can later be exteneded to include any URI such as email,
+                    hashes, tel: and devices.</p>
+                  </div>
+                </section>
+
+                <section id="LDP" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#LDP]">
+                  <h3 about="[this:#LDP]" property="dcterms:title">LDP</h3>
+                  <div about="[this:#LDP]" property="dcterms:description">
+                    <p>Linked Data Principles will be used throughout this work, and Linked Data Platform as a commodity back end.</p>
+                  </div>
+                </section>
+
+                <section id="webcredits" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#webcredits]">
+                  <h3 about="[this:#webcredits]" property="dcterms:title">Web Credits</h3>
+                  <div about="[this:#webcredits]" property="dcterms:description">
+                    <p>The web credits ontology will be used as a simple way to track credits between URIs.</p>
+                  </div>
+                </section>
+
+                <section id="webpayments" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#webpayments]">
+                  <h3 about="[this:#webpayments]" property="dcterms:title">W3C Web Payments</h3>
+                  <div about="[this:#webpayments]" property="dcterms:description">
+                    <p>The work by the W3C web payments community group will be leveraged as much as possible.</p>
+                  </div>
+                </section>
+
+
+              </div>
+            </section>
+
+
+            <section id="conclusions" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conclusions]">
+              <h2 about="[this:#conclusions]" property="dcterms:title">Conclusions</h2>
+              <div about="[this:#conclusions]" property="dcterms:description" typeof="sro:Conclusion">
+                <p>In this article, have described a simple task manager that uses linked data.  It enables tasks to be completed with friends or individually.
+                Tasks can be completed for credits, rewards and bounties.</p>
+              </div>
+            </section>
+
+            <section id="acknowledgements" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#acknowledgements]">
+              <h2 about="[this:#acknowledgements]" property="dcterms:title">Acknowledgements</h2>
+              <div about="[this:#acknowledgements]" property="dcterms:description" typeof="deo:Acknowledgements">
+                <p>We would like to extend our thanks to those individuals and groups working to make the Web better. A special thanks to <a about="http://webcredits.org/paper/" rel="cito:isReviewedBy" resource="http://deiu.rww.io/profile/card#me" href="http://deiu.rww.io/profile/card#me">Andrei Sambra</a> and MIT DIG for leading the way.</p>
+              </div>
+            </section>
+
+            <section id="references">
+              <h2>References</h2>
+              <div>
+                <ol>
+                  <li id="ref-3">Principles of Design, <a about="[this:#conceptual-design]" rel="dcterms:references cito:citesAsSourceDocument cito:citesAsRecommendedReading" href="http://www.w3.org/DesignIssues/Principles.html#PLP">http://www.w3.org/DesignIssues/Principles.html#PLP</a></li>
+                </ol>
+              </div>
+            </section>
+          </div>
+
+        </article>
+      </body>
+      </html>
