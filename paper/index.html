@@ -208,65 +208,77 @@ xml:lang="en" lang="en">
                         <p>An implementation of this work is available on github as free software under the MIT license.</p>
                       </div>
 
+
+                      <figure id="screenshot" about="[this:#screenshot]" typeof="doco:FigureBox" rel="dcterms:hasPart">
+                        <object id="seq" about="[this:#figure-data-linked-statistical-data-analysis]" typeof="doco:Figure" rel="foaf:depiction" data="wcsd.png" width="480" height="794"><a rel="dcterms:source">Source</a></object>
+
+                        <figcaption about="[this:#seq]" typeof="doco:FigureLabel" property="dcterms:description">Screenshot.</figcaption>
+                      </figure>
+
+
                       <section id="storage" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#storage]">
                         <h3 about="[this:#storage]" property="dcterms:title">Storage</h2>
-                        <div about="[this:#storage]" property="dcterms:description">
-                          <p>We use a web powered server written in nodejs, to store the initial credits, using HTTP PUT, which is part of the linked data platform.
-                          Once the new credit is put in an agreed container, anothe process monitors the container and will validate, add an UUID to the credit
-                          and send it downsteam for archiving and indexing.  For our work we are using the GOLD linked data server.</p>
-
-                          The format of the transaction is:
-
-                          <p><pre>{"source":"http://bitbots.org/workbot#this",
-                            "amount":25,
-                            "currency":"https://w3id.org/cc#bit",
-                            "destination":"http://melvincarvalho.com/#me",
-                            "timestamp":"2015-03-28T09:55:29.803Z",
-                            "context":null,
-                            "description":"work"}</pre></p>
-
-                            <p>An update to a well known file, ",meta" is also sent by the client in order to let the process know there is a new transaction.</p>
-
-                            <p>The server will then vaildate that all required fields are filled in, check that the balance is above the amount needed, and add a UUID.
-                            It will also send the message downstream, deleting the existing tx, using HTTP DELETE.  In this case we use a single table sqlite database
-                            to index processed transactions.  This works well on small scale, but due to table locking a more robust database, perhaps such as redis,
-                            would be used for more transactions.</p>
-
-                            <p>When the process is finished, it again updates ",meta" in order to let the client know there was an update.</p>
 
 
-                        </div>
-                      </section>
 
 
-                    </section>
+                          <div about="[this:#storage]" property="dcterms:description">
+                            <p>We use a web powered server written in nodejs, to store the initial credits, using HTTP PUT, which is part of the linked data platform.
+                              Once the new credit is put in an agreed container, anothe process monitors the container and will validate, add an UUID to the credit
+                              and send it downsteam for archiving and indexing.  For our work we are using the GOLD linked data server.</p>
+
+                              The format of the transaction is:
+
+                              <p><pre>{"source":"http://bitbots.org/workbot#this",
+                                "amount":25,
+                                "currency":"https://w3id.org/cc#bit",
+                                "destination":"http://melvincarvalho.com/#me",
+                                "timestamp":"2015-03-28T09:55:29.803Z",
+                                "context":null,
+                                "description":"work"}</pre></p>
+
+                                <p>An update to a well known file, ",meta" is also sent by the client in order to let the process know there is a new transaction.</p>
+
+                                <p>The server will then vaildate that all required fields are filled in, check that the balance is above the amount needed, and add a UUID.
+                                  It will also send the message downstream, deleting the existing tx, using HTTP DELETE.  In this case we use a single table sqlite database
+                                  to index processed transactions.  This works well on small scale, but due to table locking a more robust database, perhaps such as redis,
+                                  would be used for more transactions.</p>
+
+                                  <p>When the process is finished, it again updates ",meta" in order to let the client know there was an update.</p>
 
 
-                    <section id="conclusions" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conclusions]">
-                      <h2 about="[this:#conclusions]" property="dcterms:title">Conclusions</h2>
-                      <div about="[this:#conclusions]" property="dcterms:description" typeof="sro:Conclusion">
-                        <p>In this article, have described a simple task manager that uses linked data.  It enables tasks to be completed with friends or individually.
-                          Tasks can be completed for credits, rewards and bounties.</p>
-                        </div>
-                      </section>
+                                </div>
+                              </section>
 
-                      <section id="acknowledgements" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#acknowledgements]">
-                        <h2 about="[this:#acknowledgements]" property="dcterms:title">Acknowledgements</h2>
-                        <div about="[this:#acknowledgements]" property="dcterms:description" typeof="deo:Acknowledgements">
-                          <p>We would like to extend our thanks to those individuals and groups working to make the Web better. A special thanks to <a about="http://webcredits.org/paper/" rel="cito:isReviewedBy" resource="http://deiu.rww.io/profile/card#me" href="http://deiu.rww.io/profile/card#me">Andrei Sambra</a> and MIT DIG for leading the way.</p>
-                        </div>
-                      </section>
 
-                      <section id="references">
-                        <h2>References</h2>
-                        <div>
-                          <ol>
-                            <li id="ref-3">Principles of Design, <a about="[this:#conceptual-design]" rel="dcterms:references cito:citesAsSourceDocument cito:citesAsRecommendedReading" href="http://www.w3.org/DesignIssues/Principles.html#PLP">http://www.w3.org/DesignIssues/Principles.html#PLP</a></li>
-                          </ol>
-                        </div>
-                      </section>
-                    </div>
+                            </section>
 
-                  </article>
-                </body>
-                </html>
+
+                            <section id="conclusions" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conclusions]">
+                              <h2 about="[this:#conclusions]" property="dcterms:title">Conclusions</h2>
+                              <div about="[this:#conclusions]" property="dcterms:description" typeof="sro:Conclusion">
+                                <p>In this article, have described a simple task manager that uses linked data.  It enables tasks to be completed with friends or individually.
+                                  Tasks can be completed for credits, rewards and bounties.</p>
+                                </div>
+                              </section>
+
+                              <section id="acknowledgements" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#acknowledgements]">
+                                <h2 about="[this:#acknowledgements]" property="dcterms:title">Acknowledgements</h2>
+                                <div about="[this:#acknowledgements]" property="dcterms:description" typeof="deo:Acknowledgements">
+                                  <p>We would like to extend our thanks to those individuals and groups working to make the Web better. A special thanks to <a about="http://webcredits.org/paper/" rel="cito:isReviewedBy" resource="http://deiu.rww.io/profile/card#me" href="http://deiu.rww.io/profile/card#me">Andrei Sambra</a> and MIT DIG for leading the way.</p>
+                                </div>
+                              </section>
+
+                              <section id="references">
+                                <h2>References</h2>
+                                <div>
+                                  <ol>
+                                    <li id="ref-3">Principles of Design, <a about="[this:#conceptual-design]" rel="dcterms:references cito:citesAsSourceDocument cito:citesAsRecommendedReading" href="http://www.w3.org/DesignIssues/Principles.html#PLP">http://www.w3.org/DesignIssues/Principles.html#PLP</a></li>
+                                  </ol>
+                                </div>
+                              </section>
+                            </div>
+
+                          </article>
+                        </body>
+                        </html>
