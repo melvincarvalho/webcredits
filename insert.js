@@ -30,7 +30,7 @@ if (!amount || isNaN(amount) ) {
 }
 
 if (!unit) {
-  unit = 'https://w3id.org/bitmark#mark';
+  unit = 'https://w3id.org/cc#bit';
 }
 
 if (!destination) {
@@ -52,13 +52,13 @@ console.log('timestamp : ' + timestamp);
 db.serialize(function() {
 
   // check if exists and build query
-  var sql = "SELECT * FROM credit where source = '"+ source + "' and destination = '" + destination + "' and amount = " + amount 
-  if ( description ) { 
+  var sql = "SELECT * FROM credit where source = '"+ source + "' and destination = '" + destination + "' and amount = " + amount
+  if ( description ) {
     sql +=  " and description = '" + description + "'";
   } else {
     sql +=  " and description = null";
   }
-  if ( timestamp ) { 
+  if ( timestamp ) {
     sql +=  " and timestamp = '" + timestamp + "'";
   } else {
     sql +=  " and timestamp = null";
@@ -114,14 +114,14 @@ db.serialize(function() {
           } else {
             timestamp = new Date().toISOString();
           }
-   
+
 
           var doc = {
             "https://w3id.org/cc#created": { "@value" : timestamp, "@type" : "http://www.w3.org/2001/XMLSchema#dateTime" } ,
             "https://w3id.org/cc#source": { "@id": source },
             "https://w3id.org/cc#amount": { "@value" : amount, "@type" : "http://www.w3.org/2001/XMLSchema#decimal" } ,
             "https://w3id.org/cc#destination": { "@id": destination },
-            "https://w3id.org/cc#currency": { "@id": 'https://w3id.org/cc#mark' },
+            "https://w3id.org/cc#currency": { "@id": unit },
             "@type": "https://w3id.org/cc#Credit"
           };
 
@@ -137,7 +137,7 @@ db.serialize(function() {
             // helper functions
             function base64url_encode(data) {
               return btoa(data);
-            } 
+            }
 
 
             var id = 'ni:///sha-256;' + new Buffer(hash).toString('base64').replace('+', '-').replace('/', '_').replace('=', '');
@@ -146,10 +146,10 @@ db.serialize(function() {
 
 
 
-            var sql = "INSERT INTO credit(\"@id\", 'source', 'destination', 'amount', 'timestamp'";
+            var sql = "INSERT INTO credit(\"@id\", 'source', 'destination', 'amount', 'timestamp', 'currency'";
             if (description) sql += ", 'description'";
             sql += ") values ( '" + id + "', '"+ source + "' , '" + destination + "' , " + amount;
-            sql += " , '" + timestamp + "'";
+            sql += " , '" + timestamp + "'" + " , '" + unit + "'";
             if (description) sql+= " , '" + description + "'";
             sql += " )";
 
@@ -191,14 +191,3 @@ db.serialize(function() {
   });
 
 });
-
-
-
-
-
-
-
-
-
-
-

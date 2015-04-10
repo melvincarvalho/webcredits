@@ -141,21 +141,23 @@ ws.on('message', function(message) {
             req.write('');
             req.end();
 
-            options.method = 'PUT';
-            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-            + '/' + sha256(t[0]) + '/,meta';
-            console.log(options);
-            var req = https.request(options, callback);
-            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
-            req.end();
+            setTimeout(function(){
+              options.method = 'PUT';
+              options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+              + '/' + sha256(t[0]) + '/,meta';
+              console.log(options);
+              var req = https.request(options, callback);
+              req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
+              req.end();
 
-            options.method = 'PUT';
-            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-            + '/' + sha256(t[3]) + '/,meta';
-            console.log(options);
-            var req = https.request(options, callback);
-            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
-            req.end();
+              options.method = 'PUT';
+              options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+              + '/' + sha256(t[3]) + '/,meta';
+              console.log(options);
+              var req = https.request(options, callback);
+              req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
+              req.end();
+            });
 
           });
 
@@ -187,27 +189,50 @@ ws.on('message', function(message) {
 
             options.path = '/' + tx.split('/').splice(3).join('/');
             console.log(options.path);
-            var req = https.request(options, callback);
+            var req = https.request(options, function(response) {
+
+              console.log(JSON.stringify(response.headers));
+
+              var str = ''
+              response.on('data', function (chunk) {
+                str += chunk;
+              });
+
+              response.on('end', function () {
+                console.log(str);
+                console.log('file deleted');
+                setTimeout(function(){
+                  options.method = 'PUT';
+                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+                  + '/' + sha256(t[0]) + '/,meta';
+                  console.log(options);
+                  var req = https.request(options, callback);
+                  req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
+                  req.end();
+
+                  options.method = 'PUT';
+                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
+                  + '/' + sha256(t[3]) + '/,meta';
+                  console.log(options);
+                  var req = https.request(options, callback);
+                  req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
+                  req.end();
+
+
+
+                  exec('./hook.sh', function(){});
+
+
+
+                }, 500);
+              });
+
+
+            });
             //This is the data we are posting, it needs to be a string or a buffer
             req.write('');
             req.end();
 
-
-            options.method = 'PUT';
-            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-            + '/' + sha256(t[0]) + '/,meta';
-            console.log(options);
-            var req = https.request(options, callback);
-            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
-            req.end();
-
-            options.method = 'PUT';
-            options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-            + '/' + sha256(t[3]) + '/,meta';
-            console.log(options);
-            var req = https.request(options, callback);
-            req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
-            req.end();
 
           });
 
