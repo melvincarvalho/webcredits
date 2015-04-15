@@ -3,7 +3,7 @@
 xml:lang="en" lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>Taskify</title>
+  <title>Web Credits</title>
   <link rel="stylesheet" media="all" title="LNCS" href="media/css/lncs.css"/>
   <link rel="stylesheet alternate" media="all" title="ACM" href="media/css/acm.css"/>
   <link rel="stylesheet alternate" href="http://www.w3.org/StyleSheets/TR/W3C-REC.css" media="all" title="W3C-REC"/>
@@ -61,7 +61,8 @@ xml:lang="en" lang="en">
       <section id="abstract" about="http://webcredits.org/paper/">
         <h2>Abstract</h2>
         <div property="dcterms:abstract" class="entry-summary">
-          <p>We present a system of credits powered by linked data and the web.  It can perform simple workflows on its own, but is intended for use in larger workflows.</p>
+          <p>We present a system of credits powered by linked data and the web.  A web credit is defined as a credit between two URIs of a given amount and currency, at a given time.
+            It can perform simple workflows on its own, such as IOUs between entities, but is intended largely as a building block for use in larger workflows.</p>
         </div>
       </section>
 
@@ -78,8 +79,8 @@ xml:lang="en" lang="en">
         <h2 about="[this:#introduction]" property="dcterms:title">Introduction</h2>
         <div about="[this:#introduction]" property="dcterms:description" typeof="deo:Introduction">
           <p id="prologue" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#prologue]" typeof="deo:Prologue" property="dcterms:description" rel="cito:parodies" resource="http://dbpedia.org/resource/Where_no_man_has_gone_before">
-            We present credit based system for linked data and the world wide web.  The model is as simple as we could make it allowing a credit between two URIs an amount and a currency.
-            It is intended to be part of a larger workflow, however can be used as stand alone for simple cases.  We also present a simple server that can be used to process, net and
+            We present credit based system for linked data and the world wide web.  The model is simple and allows for a credit to be issued between two URIs, for an amount and in a specific currency, at a given time.
+            It is intended to be part of a larger workflow, however can be used as stand alone for simple cases.  We also present a simple server that can be used to process, validate and
             aggregate accumulated credits.</span></p>
 
             <p id="motivation" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#motivation]" typeof="sro:Motivation" property="dcterms:description"></span></p>
@@ -99,8 +100,7 @@ xml:lang="en" lang="en">
               <h3 about="[this:#decentralization]" property="dcterms:title">Decentralization</h3>
               <div about="[this:#decentralization]" property="dcterms:description">
                 <p>As much of the system as possible should be decentralized.  This includes, identity, accounts, credits, wallets and messaging.  This
-                  is achieved by giving anything of note a URI.  That allows any domain to host any aspect of the system.  The app is 100% client side and only relies
-                  on commodoty storage as a backend, via linked data platform.</p>
+                  is achieved by giving anything of note a URI.  That allows any domain to host any aspect of the system.</p>
                 </div>
               </section>
 
@@ -117,7 +117,6 @@ xml:lang="en" lang="en">
                 <div about="[this:#standards]" property="dcterms:description">
                   <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are W3C Design Issues, WebID, Linked Data, Linked Data Platform,
                     HTML5, RESTful principles and Websockets.</p>
-
                   </div>
                 </section>
 
@@ -138,8 +137,7 @@ xml:lang="en" lang="en">
             <section id="conceptual-design" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conceptual-design]">
               <h2 about="[this:#conceptual-design]" property="dcterms:title">Conceptual Design</h2>
               <div about="[this:#conceptual-design]" property="dcterms:description">
-                <p>The system deals with discovery of information, from user, to workspace, to appication specific data storage.  It deals with showing task boards and tasks using HTTP GET,
-                  with updating tasks and task boards, using HTTP PUT/POST.  The system also provides a mechanism for realtime notifications using websockets.</p>
+                <p>The system deals with discovery of information, from user, to workspace, to appication specific data storage.  It deals with finding where to PUT a new transaction.</p>
 
                 </div>
 
@@ -166,7 +164,7 @@ xml:lang="en" lang="en">
                   <h2 about="[this:#components]" property="dcterms:title">Components</h2>
                   <div about="[this:#components]" property="dcterms:description">
                     <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are W3C Design Issues, WebID, Linked Data, Linked Data Platform,
-                      HTML5, RESTful principles and Websockets</p>
+                      HTML5, SoLiD, RESTful principles and Websockets</p>
 
                       <section id="WebID" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#WebID]">
                         <h3 about="[this:#WebID]" property="dcterms:title">WebID</h3>
@@ -257,8 +255,8 @@ xml:lang="en" lang="en">
                             <section id="conclusions" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conclusions]">
                               <h2 about="[this:#conclusions]" property="dcterms:title">Conclusions</h2>
                               <div about="[this:#conclusions]" property="dcterms:description" typeof="sro:Conclusion">
-                                <p>In this article, have described a simple task manager that uses linked data.  It enables tasks to be completed with friends or individually.
-                                  Tasks can be completed for credits, rewards and bounties.</p>
+                                <p>In this article, have described a simple method for creating web credits, validating them and updating resources in realtime.  Future work
+                                will deal with scalability to handle trillions of transactions, and integrations between systems.</p>
                                 </div>
                               </section>
 
