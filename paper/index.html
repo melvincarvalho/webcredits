@@ -61,83 +61,83 @@ xml:lang="en" lang="en">
       <section id="abstract" about="http://webcredits.org/paper/">
         <h2>Abstract</h2>
         <div property="dcterms:abstract" class="entry-summary">
-          <p>We present a system of credits powered by linked data and the web.  A web credit is defined as a credit between two URIs of a given amount and currency, at a given time.
-            It can perform simple workflows on its own, such as IOUs between entities, but is intended largely as a building block for use in larger workflows.</p>
-        </div>
-      </section>
-
-      <section id="keywords" about="http://webcredits.org/paper/">
-        <h2>Keywords</h2>
-        <div>
-          <ul rel="dcterms:subject">
-            <li><a resource="http://dbpedia.org/resource/Linked_Data" href="http://en.wikipedia.org/wiki/Linked_Data">Linked Data</a></li>
-          </ul>
-        </div>
-      </section>
-
-      <section id="introduction" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#introduction]">
-        <h2 about="[this:#introduction]" property="dcterms:title">Introduction</h2>
-        <div about="[this:#introduction]" property="dcterms:description" typeof="deo:Introduction">
-          <p id="prologue" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#prologue]" typeof="deo:Prologue" property="dcterms:description" rel="cito:parodies" resource="http://dbpedia.org/resource/Where_no_man_has_gone_before">
-            We present credit based system for linked data and the world wide web.  The model is simple and allows for a credit to be issued between two URIs, for an amount and in a specific currency, at a given time.
-            It is intended to be part of a larger workflow, however can be used as stand alone for simple cases.  We also present a simple server that can be used to process, validate and
-            aggregate accumulated credits.</span></p>
-
-            <p id="motivation" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#motivation]" typeof="sro:Motivation" property="dcterms:description"></span></p>
-
-            <p></p>
-
-
+          <p>We present a system of credits powered by the Social Linked Data Platform (SoLiD).  A web credit is defined to be recorded as an amount, between two URIs of a given amount and currency, at a given time.
+            It can be used to perform simple workflows on its own, such as IOUs between entities, but is intended to be a building block for use in larger workflows.</p>
           </div>
         </section>
 
+        <section id="keywords" about="http://webcredits.org/paper/">
+          <h2>Keywords</h2>
+          <div>
+            <ul rel="dcterms:subject">
+              <li><a resource="http://dbpedia.org/resource/Linked_Data" href="http://en.wikipedia.org/wiki/Linked_Data">Linked Data</a></li>
+            </ul>
+          </div>
+        </section>
 
-        <section id="requirements" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#requirements]">
-          <h2 about="[this:#requirements]" property="dcterms:title">Non-Functional Requirements</h2>
-          <div about="[this:#requirements]" property="dcterms:description">
+        <section id="introduction" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#introduction]">
+          <h2 about="[this:#introduction]" property="dcterms:title">Introduction</h2>
+          <div about="[this:#introduction]" property="dcterms:description" typeof="deo:Introduction">
+            <p id="prologue" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#prologue]" typeof="deo:Prologue" property="dcterms:description" rel="cito:parodies" resource="http://dbpedia.org/resource/Where_no_man_has_gone_before">
+              We present credit based system for linked data and the world wide web.  The model is simple and allows for a credit to be issued between two URIs, for an amount and in a specific currency, at a given time.
+              It is intended to be part of a larger workflow, however can be used as stand alone for simple cases.  We also present a simple server that can be used to process, validate and
+              aggregate accumulated credits.</span></p>
 
-            <section id="decentralization" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#decentralization]">
-              <h3 about="[this:#decentralization]" property="dcterms:title">Decentralization</h3>
-              <div about="[this:#decentralization]" property="dcterms:description">
-                <p>As much of the system as possible should be decentralized.  This includes, identity, accounts, credits, wallets and messaging.  This
-                  is achieved by giving anything of note a URI.  That allows any domain to host any aspect of the system.</p>
-                </div>
-              </section>
+              <p id="motivation" about="http://webcredits.org/paper/" rel="dcterms:hasPart"><span about="[this:#motivation]" typeof="sro:Motivation" property="dcterms:description"></span></p>
 
-              <section id="accessibility" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#accessibility]">
-                <h3 about="[this:#accessibility]" property="dcterms:title">Accessibility</h3>
-                <div about="[this:#accessibility]" property="dcterms:description">
-                  <p>Accessiblity and ARIA guidelines are a goal of the project, so that as many people and possible can use wallets</p>
-                </div>
-              </section>
+              <p></p>
 
 
-              <section id="standards" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#standards]">
-                <h3 about="[this:#standards]" property="dcterms:title">Web Standards</h3>
-                <div about="[this:#standards]" property="dcterms:description">
-                  <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are W3C Design Issues, WebID, Linked Data, Linked Data Platform,
-                    HTML5, RESTful principles and Websockets.</p>
+            </div>
+          </section>
+
+
+          <section id="requirements" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#requirements]">
+            <h2 about="[this:#requirements]" property="dcterms:title">Non-Functional Requirements</h2>
+            <div about="[this:#requirements]" property="dcterms:description">
+
+              <section id="decentralization" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#decentralization]">
+                <h3 about="[this:#decentralization]" property="dcterms:title">Decentralization</h3>
+                <div about="[this:#decentralization]" property="dcterms:description">
+                  <p>As much of the system as possible should be decentralized.  This includes, identity, accounts, credits, wallets and messaging.  This
+                    is achieved by giving anything of note a URI.  That allows any domain to host any aspect of the system.</p>
+                  </div>
+                </section>
+
+                <section id="accessibility" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#accessibility]">
+                  <h3 about="[this:#accessibility]" property="dcterms:title">Accessibility</h3>
+                  <div about="[this:#accessibility]" property="dcterms:description">
+                    <p>Accessiblity and ARIA guidelines are a goal of the project, so that as many people and possible can use wallets</p>
                   </div>
                 </section>
 
 
-                <section id="security" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#security]">
-                  <h3 about="[this:#security]" property="dcterms:title">Security</h3>
-                  <div about="[this:#security]" property="dcterms:description">
-                    <p>Work is done on security, in particular the tools used are Web Access Control, and TLS.  More tools will be added over time.</p>
-
-                  </div>
-                </section>
-
-
-              </div>
-            </section>
+                <section id="standards" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#standards]">
+                  <h3 about="[this:#standards]" property="dcterms:title">Web Standards</h3>
+                  <div about="[this:#standards]" property="dcterms:description">
+                    <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are W3C Design Issues, WebID, Linked Data, Linked Data Platform,
+                      HTML5, RESTful principles and Websockets.</p>
+                    </div>
+                  </section>
 
 
-            <section id="conceptual-design" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conceptual-design]">
-              <h2 about="[this:#conceptual-design]" property="dcterms:title">Conceptual Design</h2>
-              <div about="[this:#conceptual-design]" property="dcterms:description">
-                <p>The system deals with discovery of information, from user, to workspace, to appication specific data storage.  It deals with finding where to PUT a new transaction.</p>
+                  <section id="security" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#security]">
+                    <h3 about="[this:#security]" property="dcterms:title">Security</h3>
+                    <div about="[this:#security]" property="dcterms:description">
+                      <p>Work is done on security, in particular the tools used are Web Access Control, and TLS.  More tools will be added over time.</p>
+
+                    </div>
+                  </section>
+
+
+                </div>
+              </section>
+
+
+              <section id="conceptual-design" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conceptual-design]">
+                <h2 about="[this:#conceptual-design]" property="dcterms:title">Conceptual Design</h2>
+                <div about="[this:#conceptual-design]" property="dcterms:description">
+                  <p>The system deals with discovery of information, from user, to workspace, to appication specific data storage.  It deals with finding where to PUT a new transaction.</p>
 
                 </div>
 
@@ -166,25 +166,18 @@ xml:lang="en" lang="en">
                     <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are <cite><a href="https://linkeddata.github.io/SoLiD/">SoLiD</a></cite>, W3C Design Issues, WebID, Linked Data, Linked Data Platform,
                       HTML5, RESTful principles and Websockets</p>
 
-                      <section id="WebID" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#WebID]">
-                        <h3 about="[this:#WebID]" property="dcterms:title">WebID</h3>
-                        <div about="[this:#WebID]" property="dcterms:description">
-                          <p>WebID will be used for Identity.  A WebID is an HTTP URI that denotes an Agent.  Hash URIs are preferred.  The system can later be exteneded to include any URI such as email,
-                            hashes, tel: and devices.</p>
-                          </div>
-                        </section>
-
-                        <section id="LDP" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#LDP]">
-                          <h3 about="[this:#LDP]" property="dcterms:title">LDP</h3>
-                          <div about="[this:#LDP]" property="dcterms:description">
-                            <p>Linked Data Principles will be used throughout this work, and Linked Data Platform as a commodity back end.</p>
+                        <section id="solid" about="[this:#solid]" rel="dcterms:hasPart" resource="[this:#solid]">
+                          <h3 about="[this:#solid]" property="dcterms:title">SoLiD</h3>
+                          <div about="[this:#solid]" property="dcterms:description">
+                            <p><cite><a href="https://linkeddata.github.io/SoLiD/">SoLiD</a></cite> is the social linked data platform.  SoLiD was designed from the ground up to be modular and openly extensible. It relies as much as possible on existing W3C standards.
+                              RDF, LDP, Websockets, WebID, WebID-TLS, WebID-RSA, WebAccessControl</p>
                           </div>
                         </section>
 
                         <section id="webcredits" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#webcredits]">
                           <h3 about="[this:#webcredits]" property="dcterms:title">Web Credits</h3>
                           <div about="[this:#webcredits]" property="dcterms:description">
-                            <p>The web credits ontology will be used as a simple way to track credits between URIs.</p>
+                            <p>The webcredits ontology will be used as a simple way to track credits between URIs.</p>
                           </div>
                         </section>
 
@@ -256,7 +249,7 @@ xml:lang="en" lang="en">
                               <h2 about="[this:#conclusions]" property="dcterms:title">Conclusions</h2>
                               <div about="[this:#conclusions]" property="dcterms:description" typeof="sro:Conclusion">
                                 <p>In this article, have described a simple method for creating web credits, validating them and updating resources in realtime.  Future work
-                                will deal with scalability to handle trillions of transactions, and integrations between systems.</p>
+                                  will deal with scalability to handle trillions of transactions, and integrations between systems.</p>
                                 </div>
                               </section>
 
@@ -271,7 +264,7 @@ xml:lang="en" lang="en">
                                 <h2>References</h2>
                                 <div>
                                   <ol>
-                                    <li id="ref-3">Principles of Design, <a about="[this:#conceptual-design]" rel="dcterms:references cito:citesAsSourceDocument cito:citesAsRecommendedReading" href="http://www.w3.org/DesignIssues/Principles.html#PLP">http://www.w3.org/DesignIssues/Principles.html#PLP</a></li>
+                                    <li id="ref-3">Principles of Design<a about="[this:#conceptual-design]" rel="dcterms:references cito:citesAsSourceDocument cito:citesAsRecommendedReading" href="http://www.w3.org/DesignIssues/Principles.html#PLP">http://www.w3.org/DesignIssues/Principles.html#PLP</a></li>
                                   </ol>
                                 </div>
                               </section>
