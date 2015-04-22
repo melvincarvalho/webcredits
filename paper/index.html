@@ -139,10 +139,55 @@ xml:lang="en" lang="en">
               <section id="conceptual-design" about="http://webcredits.org/paper/" rel="dcterms:hasPart" resource="[this:#conceptual-design]">
                 <h2 about="[this:#conceptual-design]" property="dcterms:title">Conceptual Design</h2>
                 <div about="[this:#conceptual-design]" property="dcterms:description">
-                  <p>The system deals with discovery of information, from user, to workspace, to appication specific data storage.  It deals with finding where to PUT a new transaction.</p>
+                  <p>The system is used for balances, payments, withdrawals and deposits.  Balances are generally found using HTTP GET to an API.  Another part of the API also will display
+                  transactions, for that user.  New transactions are sent to linked data platform container.  A process watches for new entries on the container via a websocket.  When a new
+                  transaction is found, it is validated, and then processed.  Transactions conform to the webcredits ontology.  An ID is added by taking a sha256 hash of the canonical form of
+                  the credit.  For a given wallet, balances are checked that they do not fall below zero.  After processing the credit is added to an sqlite database for archiving and indexing
+                  purposes.  Notifications are sent to listening clients via websockets.  A hook may be called after a payment is recieved to process new actions.</p>
 
                 </div>
 
+
+                <section id="balances" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#balances]">
+                  <h3 about="[this:#balances]" property="dcterms:title">Balances</h3>
+                  <div about="[this:#balances]" property="dcterms:description">
+                    <p>In our system any URI can have a balance and operate as a wallet or bank account.  The system will integently route payments to the right place.  The system deals
+                      with two types of URI to begin with.  Agents and Accounts.  A person is a URI that denotes an a Person, organization or Group.  An account is a sub division, normally
+                      within a payment processor that is assigned to an agent.  Balances will be returned for the given URI, normally containing that URI, the amount and the currency.  Currently located at
+                      /api/v1/tx?uri= the format is</p>
+
+
+                      <p><pre>{"@id":"http://melvincarvalho.com/#me",
+                        "amount":250,
+                        "currency":"https://w3id.org/cc#bit"}
+                      </pre></p>
+
+                      <p>In order to scale, transaction history is limited to 100 by default.  Another API not yet created, will allow access to archives.</p>
+
+                    </div>
+                  </section>
+
+
+                  <section id="transactions" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#transactions]">
+                    <h3 about="[this:#transactions]" property="dcterms:title">Transaction History</h3>
+                    <div about="[this:#transactions]" property="dcterms:description">
+                      <p>Transaction History is an API that returns transactions for a given URI (account or agent) in JSON or turtle format.
+                        Currently the location is : /api/v1/tx?uri= but this needs to become more scalable.  The format supported so far is JSON.</p>
+
+
+                        <p><pre>{"@id":"ni:///sha-256;dTlpZmY3L1pJUEoxLy90VWkxR00xUFhZQTY5eUdJckpWY04zdXk3elJwdz0",
+                          "source":"http://bitbots.org/workbot#this",
+                          "amount":250,
+                          "currency":"https://w3id.org/cc#bit",
+                          "destination":"http://melvincarvalho.com/#me",
+                          "timestamp":"2015-03-28T09:55:29.803Z",
+                          "context":null,
+                          "description":"work"}</pre></p>
+
+                          <p>In order to scale, transaction history is limited to 100 by default.  Another API not yet created, will allow access to archives.</p>
+
+                        </div>
+                      </section>
 
                 <section id="discovery" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#discovery]">
                   <h3 about="[this:#discovery]" property="dcterms:title">Discovery</h3>
@@ -179,7 +224,7 @@ xml:lang="en" lang="en">
                         <section id="webcredits" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#webcredits]">
                           <h3 about="[this:#webcredits]" property="dcterms:title">Web Credits</h3>
                           <div about="[this:#webcredits]" property="dcterms:description">
-                            <p>The webcredits ontology will be used as a simple way to track credits between URIs.</p>
+                            <p>The <cite><a href="https://webcredits.org/">webcredits</a></cite> ontology will be used as a simple way to track credits between URIs.</p>
                           </div>
                         </section>
 
