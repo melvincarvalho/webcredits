@@ -12,7 +12,7 @@ var sub    = ldpc + ',meta';
 var subs   = [];
 
 console.log('running webcredits daemon on ' + domain);
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 subs.push(sub);
 var ws    = new WebSocket(wss, null, {rejectUnauthorized: false});
@@ -100,18 +100,33 @@ ws.on('message', function(message) {
         var destination = g.any($rdf.sym(tx), CURR('destination'));
         var amount      = g.any($rdf.sym(tx), CURR('amount'));
         var currency    = g.any($rdf.sym(tx), CURR('currency'));
+        var comment     = g.any($rdf.sym(tx), RDFS('comment'));
+
+        if (comment) {
+          comment = comment.value;
+        } else {
+          comment = 'vw';
+        }
 
 
         if (!source || !destination || !amount || !currency) return;
 
-        var t = [source.value, amount.value, currency.value, destination.value];
+        var t = [source.value, amount.value, currency.value, destination.value, comment];
         console.log(t);
 
 
         // withdraw
-        if (t[3].indexOf('bitmark:') === 0) {
+        if (t[3].indexOf('bitmark:') === 0 || t[3].indexOf('bitcoin:') === 0) {
 
-          command = 'bitmark-cli sendtoaddress ' + t[3].split(":")[1] + ' ' + ( parseFloat(t[1]) / 1000.0 )
+          if (t[3].indexOf('bitmark:') === 0) {
+            command = 'bitmark-cli sendtoaddress ' + t[3].split(":")[1] + ' ' + ( parseFloat(t[1]) / 1000.0 );
+          }
+
+          if (t[3].indexOf('bitcoin:') === 0) {
+            command = 'bitcoin-cli sendtoaddress ' + t[3].split(":")[1] + ' ' + ( parseFloat(t[1]) / 1000.0 );
+          }
+
+
           console.log(command);
           exec(command, function(error, stdout, stderr) {
             console.log('stdout: ' + stdout);
@@ -124,7 +139,7 @@ ws.on('message', function(message) {
 
               console.log(JSON.stringify(response.headers));
 
-              var str = ''
+              var str = '';
               response.on('data', function (chunk) {
                 str += chunk;
               });
@@ -132,7 +147,7 @@ ws.on('message', function(message) {
               response.on('end', function () {
                 console.log(str);
               });
-            }
+            };
 
             options.path = '/' + tx.split('/').splice(3).join('/');
             console.log(options.path);
@@ -143,18 +158,16 @@ ws.on('message', function(message) {
 
             setTimeout(function(){
               options.method = 'PUT';
-              options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-              + '/' + sha256(t[0]) + '/,meta';
+              options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[0]) + '/,meta';
               console.log(options);
               var req = https.request(options, callback);
               req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
               req.end();
 
               options.method = 'PUT';
-              options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-              + '/' + sha256(t[3]) + '/,meta';
+              options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[3]) + '/,meta';
               console.log(options);
-              var req = https.request(options, callback);
+              req = https.request(options, callback);
               req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
               req.end();
             });
@@ -164,7 +177,7 @@ ws.on('message', function(message) {
 
         } else {
 
-          var command = "nodejs insert.js '"+t[0]+"' "+t[1]+" '"+t[2]+"' '"+t[3]+"' 'vw'";
+          var command = "nodejs insert.js '"+t[0]+"' "+t[1]+" '"+t[2]+"' '"+t[3]+"' '"+t[4]+"'";
           console.log(command);
           exec(command, function(error, stdout, stderr) {
             console.log('stdout: ' + stdout);
@@ -177,7 +190,7 @@ ws.on('message', function(message) {
 
               console.log(JSON.stringify(response.headers));
 
-              var str = ''
+              var str = '';
               response.on('data', function (chunk) {
                 str += chunk;
               });
@@ -185,7 +198,7 @@ ws.on('message', function(message) {
               response.on('end', function () {
                 console.log(str);
               });
-            }
+            };
 
             options.path = '/' + tx.split('/').splice(3).join('/');
             console.log(options.path);
@@ -193,7 +206,7 @@ ws.on('message', function(message) {
 
               console.log(JSON.stringify(response.headers));
 
-              var str = ''
+              var str = '';
               response.on('data', function (chunk) {
                 str += chunk;
               });
@@ -203,18 +216,16 @@ ws.on('message', function(message) {
                 console.log('file deleted');
                 setTimeout(function(){
                   options.method = 'PUT';
-                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-                  + '/' + sha256(t[0]) + '/,meta';
+                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[0]) + '/,meta';
                   console.log(options);
                   var req = https.request(options, callback);
                   req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
                   req.end();
 
                   options.method = 'PUT';
-                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/')
-                  + '/' + sha256(t[3]) + '/,meta';
+                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[3]) + '/,meta';
                   console.log(options);
-                  var req = https.request(options, callback);
+                  req = https.request(options, callback);
                   req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
                   req.end();
 
