@@ -8,7 +8,7 @@ var port   = 443;
 var ldpc   = process.argv[2] || 'https://klaranet.com/d/user/';
 var domain = ldpc.split('/')[2];
 var wss    = 'wss://'+domain+':'+port+'/';
-var sub    = ldpc + ',meta';
+var sub    = ldpc;
 var subs   = [];
 
 console.log('running webcredits daemon on ' + domain);
@@ -63,7 +63,7 @@ ws.on('open', function() {
 
 
     for (var i=0; i<x.length; i++) {
-      var sub = 'sub ' + x[i].object.uri + ',meta';
+      var sub = 'sub ' + x[i].object.uri;
       console.log(sub);
       ws.send( sub );
     }
@@ -92,7 +92,7 @@ ws.on('message', function(message) {
     var x = g.statementsMatching($rdf.sym(ldpc), LDP("contains"));
     for (var i=0; i<x.length; i++) {
       var tx = x[i].object.uri;
-      if (! (/.*[0-9]+$/).test(tx) ) continue;
+      if (! (/.*[0-9a-z]+$/).test(tx) ) continue;
       console.log(tx);
 
       f.requestURI(tx,undefined,true, function(ok, body, xhr) {
@@ -155,7 +155,7 @@ ws.on('message', function(message) {
             //This is the data we are posting, it needs to be a string or a buffer
             req.write('');
             req.end();
-
+/*
             setTimeout(function(){
               options.method = 'PUT';
               options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[0]) + '/,meta';
@@ -171,7 +171,7 @@ ws.on('message', function(message) {
               req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
               req.end();
             });
-
+*/
           });
 
 
@@ -214,6 +214,7 @@ ws.on('message', function(message) {
               response.on('end', function () {
                 console.log(str);
                 console.log('file deleted');
+                /*
                 setTimeout(function(){
                   options.method = 'PUT';
                   options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[0]) + '/,meta';
@@ -236,6 +237,7 @@ ws.on('message', function(message) {
 
 
                 }, 500);
+                */
               });
 
 
