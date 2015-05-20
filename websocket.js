@@ -214,8 +214,8 @@ ws.on('message', function(message) {
               response.on('end', function () {
                 console.log(str);
                 console.log('file deleted');
-                /*
                 setTimeout(function(){
+                  /*
                   options.method = 'PUT';
                   options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[0]) + '/,meta';
                   console.log(options);
@@ -231,13 +231,13 @@ ws.on('message', function(message) {
                   req.end();
 
 
+                  */
 
                   exec('./hook.sh', function(){});
 
 
 
                 }, 500);
-                */
               });
 
 
