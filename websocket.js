@@ -5,7 +5,7 @@ var https     = require('https');
 var sha256    = require('sha256');
 
 var port   = 443;
-var ldpc   = process.argv[2] || 'https://klaranet.com/d/user/';
+var ldpc   = process.argv[2] || 'https://localhost/etc/wallet/inartes.com/inbox/';
 var domain = ldpc.split('/')[2];
 var wss    = 'wss://'+domain+':'+port+'/';
 var sub    = ldpc;
@@ -52,6 +52,9 @@ var f = $rdf.fetcher(g, TIMEOUT);
 
 console.log(ws);
 
+//
+//  connect to inboxes
+//
 ws.on('open', function() {
 
   console.log('fetching user dirs from ' + ldpc);
@@ -70,9 +73,11 @@ ws.on('open', function() {
   });
 });
 
+var queue = {};
 
-
-
+//
+//  listen for messages
+//
 ws.on('message', function(message) {
   console.log('received: %s', message);
 
@@ -81,11 +86,13 @@ ws.on('message', function(message) {
 
   ldpc = message.split(' ')[1].split(',')[0];
 
-
   var g = $rdf.graph();
   var f = $rdf.fetcher(g, TIMEOUT);
 
 
+  //
+  //  get directory
+  //
   f.requestURI(ldpc,undefined,true, function(ok, body, xhr) {
     console.log('tx fetched');
 
@@ -95,12 +102,16 @@ ws.on('message', function(message) {
       if (! (/.*[0-9a-z]+$/).test(tx) ) continue;
       console.log(tx);
 
+      //
+      //  process each file in directory
+      //
       f.requestURI(tx,undefined,true, function(ok, body, xhr) {
-        var source      = g.any($rdf.sym(tx), CURR('source'));
-        var destination = g.any($rdf.sym(tx), CURR('destination'));
-        var amount      = g.any($rdf.sym(tx), CURR('amount'));
-        var currency    = g.any($rdf.sym(tx), CURR('currency'));
-        var comment     = g.any($rdf.sym(tx), RDFS('comment'));
+        var subject = $rdf.sym(tx + '#this');
+        var source      = g.any(subject, CURR('source'));
+        var destination = g.any(subject, CURR('destination'));
+        var amount      = g.any(subject, CURR('amount'));
+        var currency    = g.any(subject, CURR('currency'));
+        var comment     = g.any(subject, RDFS('comment'));
 
         if (comment) {
           comment = comment.value;
@@ -109,13 +120,25 @@ ws.on('message', function(message) {
         }
 
 
+        console.log([source, destination, amount, currency, comment, tx, queue]);
+
+
+
+        if (queue[tx]) {
+          console.log('already processed : ' + tx);
+          return;
+        }
         if (!source || !destination || !amount || !currency) return;
+
+        queue[tx] = {id : tx};
 
         var t = [source.value, amount.value, currency.value, destination.value, comment];
         console.log(t);
 
 
-        // withdraw
+        //
+        //  withdraw
+        //
         if (t[3].indexOf('bitmark:') === 0 || t[3].indexOf('bitcoin:') === 0) {
 
           if (t[3].indexOf('bitmark:') === 0) {
@@ -175,8 +198,15 @@ ws.on('message', function(message) {
           });
 
 
+        //
+        //  pay
+        //
         } else {
 
+
+          //
+          //  call insert
+          //
           var command = "nodejs insert.js '"+t[0]+"' "+t[1]+" '"+t[2]+"' '"+t[3]+"' '"+t[4]+"'";
           console.log(command);
           exec(command, function(error, stdout, stderr) {
@@ -198,8 +228,13 @@ ws.on('message', function(message) {
               response.on('end', function () {
                 console.log(str);
               });
+
+
             };
 
+            //
+            //  then delete
+            //
             options.path = '/' + tx.split('/').splice(3).join('/');
             console.log(options.path);
             var req = https.request(options, function(response) {
@@ -215,26 +250,17 @@ ws.on('message', function(message) {
                 console.log(str);
                 console.log('file deleted');
                 setTimeout(function(){
-                  /*
-                  options.method = 'PUT';
-                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[0]) + '/,meta';
-                  console.log(options);
-                  var req = https.request(options, callback);
-                  req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
-                  req.end();
 
-                  options.method = 'PUT';
-                  options.path = '/' + tx.split('/').splice(3, tx.split('/').splice(3).length-2 ).join('/') + '/' + sha256(t[3]) + '/,meta';
-                  console.log(options);
-                  req = https.request(options, callback);
-                  req.write('<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ');
-                  req.end();
-
-
-                  */
-
-                  exec('./hook.sh', function(){});
-
+                  //
+                  //  then call a hook
+                  //
+                  exec('./hook.sh', function(error, stdout, stderr) {
+                    console.log('stdout: ' + stdout);
+                    console.log('stderr: ' + stderr);
+                    if (error !== null) {
+                      console.log('exec error: ' + error);
+                    }
+                  });
 
 
                 }, 500);

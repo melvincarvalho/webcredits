@@ -1,3 +1,4 @@
 #!/bin/bash
 
-# add your hook here
+
+  $HOME/data/d/chat/image/next.sh
