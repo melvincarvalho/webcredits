@@ -254,7 +254,7 @@ ws.on('message', function(message) {
                   //
                   //  then call a hook
                   //
-                  exec('./hook.sh', function(error, stdout, stderr) {
+                  exec('./hook.sh ' + sha256(source.value), function(error, stdout, stderr) {
                     console.log('stdout: ' + stdout);
                     console.log('stderr: ' + stderr);
                     if (error !== null) {
