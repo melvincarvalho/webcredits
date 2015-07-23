@@ -5,11 +5,7 @@ var https     = require('https');
 var sha256    = require('sha256');
 
 var port   = 443;
-<<<<<<< HEAD
 var ldpc   = process.argv[2] || 'https://gitpay.databox.me/Public/.wallet/github.com/linkeddata/SoLiD/wallet/inbox/';
-=======
-var ldpc   = process.argv[2] || 'https://localhost/etc/wallet/inartes.com/inbox/';
->>>>>>> a2723ba3e3bfb0db58c2b0dc28e0dbd3cbf8e581
 var domain = ldpc.split('/')[2];
 var wss    = 'wss://'+domain+':'+port+'/';
 var sub    = ldpc;
@@ -56,13 +52,6 @@ var f = $rdf.fetcher(g, TIMEOUT);
 
 console.log(ws);
 
-<<<<<<< HEAD
-=======
-//
-//  connect to inboxes
-//
-ws.on('open', function() {
->>>>>>> a2723ba3e3bfb0db58c2b0dc28e0dbd3cbf8e581
 
 
 
@@ -110,7 +99,6 @@ function subscribe(ldpc) {
 }
 
 
-<<<<<<< HEAD
 //
 //  connect to inboxes
 //
@@ -122,15 +110,6 @@ ws.on('open', function() {
 });
 
 var queue = {};
-=======
-var queue = {};
-
-//
-//  listen for messages
-//
-ws.on('message', function(message) {
-  console.log('received: %s', message);
->>>>>>> a2723ba3e3bfb0db58c2b0dc28e0dbd3cbf8e581
 
 //
 //  listen for messages
