@@ -5,7 +5,7 @@ var crypto = require('crypto');
 
 // init
 var store = 'sqlite';
-var storename = 'credit.db';
+var storename = __dirname + '/credit.db';
 var db = new sqlite3.Database(storename);
 
 
