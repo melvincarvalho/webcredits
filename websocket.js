@@ -10,19 +10,21 @@ var domain = ldpc.split('/')[2];
 var wss    = 'wss://'+domain+':'+port+'/';
 var sub    = ldpc;
 var subs   = [];
+var ws;
 
 console.log('running webcredits daemon on ' + domain);
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 subs.push(sub);
-var ws    = new WebSocket(wss, null, {rejectUnauthorized: false});
+connect();
+
+
 
 var options = {
   host: domain,
   port: port,
   method: 'DELETE'
 };
-
 
 
 // Globals
@@ -53,29 +55,40 @@ var f = $rdf.fetcher(g, TIMEOUT);
 console.log(ws);
 
 
+var isDaemonRunning = false;
+var isConnected     = false;
+
+
+function outputCommand(error, stdout, stderr) {
+  console.log('stdout: ' + stdout);
+  console.log('stderr: ' + stderr);
+  if (error !== null) {
+    console.log('exec error: ' + error);
+  }
+}
 
 
 
-
-
-
-
-
-
-ws.on('close', function close() {
-  console.log('disconnected');
-});
 
 function run() {
-
-  console.log('sending ping');
-  ws.send('ping');
+  try {
+    console.log('sending ping');
+    ws.send('ping');
+  } catch(err) {
+    console.log(err);
+    connect();
+    listen();
+  }
 
 }
 
 function daemon() {
+  if (isDaemonRunning) return;
+
   console.log('running daemon');
+
   var heartbeat = 60;
+  isDaemonRunning = true;
   run();
   setInterval(run, heartbeat * 1000);
 }
@@ -84,228 +97,251 @@ function daemon() {
 
 
 function subscribe(ldpc) {
-  console.log('fetching user dirs from ' + ldpc);
-  f.requestURI(ldpc,undefined,true, function(ok, body, xhr) {
-    console.log('container fetched');
+  if (isConnected) return;
 
-    var x = g.statementsMatching($rdf.sym(ldpc), LDP("contains"));
+  try {
+    console.log('fetching user dirs from ' + ldpc);
+    f.requestURI(ldpc,undefined,true, function(ok, body, xhr) {
+      console.log('container fetched');
 
-    for (var i=0; i<x.length; i++) {
-      var sub = 'sub ' + x[i].object.uri;
-      console.log(sub);
-      ws.send( sub );
-    }
+      var x = g.statementsMatching($rdf.sym(ldpc), LDP("contains"));
+
+      for (var i=0; i<x.length; i++) {
+        var sub = 'sub ' + x[i].object.uri;
+        console.log(sub);
+        ws.send( sub );
+      }
+    });
+
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+
+function start() {
+  daemon();
+  subscribe(ldpc);
+}
+
+
+var queue = {};
+
+function connect() {
+  var reconnectInterval = 60000;
+  ws = new WebSocket(wss, null, {rejectUnauthorized: false});
+
+  //
+  //  connect to inboxes
+  //
+  ws.on('open', function() {
+    isConnected = true;
+    listen();
+    start();
+  });
+
+  ws.on('error', function() {
+    console.log('socket error');
+    setTimeout(connect, reconnectInterval);
+  });
+
+
+  ws.on('close', function() {
+    console.log('disconnected');
+    isConnected = false;
+    console.log('socket close');
+    setTimeout(connect, reconnectInterval);
   });
 }
 
 
-//
-//  connect to inboxes
-//
-ws.on('open', function() {
 
-  daemon();
-  subscribe(ldpc);
-
-});
-
-var queue = {};
-
-//
-//  listen for messages
-//
-ws.on('message', function(message) {
-  var now = '[' + new Date().toISOString() + '] ';
-  console.log(now + ' ' + message);
-
-  if (message === 'pong') return;
-
-
-  ldpc = message.split(' ')[1].split(',')[0];
-
-  var g = $rdf.graph();
-  var f = $rdf.fetcher(g, TIMEOUT);
+function listen() {
 
 
   //
-  //  get directory
+  //  listen for messages
   //
-  f.requestURI(ldpc,undefined,true, function(ok, body, xhr) {
-    console.log('tx fetched');
+  ws.on('message', function(message) {
+    var now = '[' + new Date().toISOString() + '] ';
+    console.log(now + ' ' + message);
 
-    var x = g.statementsMatching($rdf.sym(ldpc), LDP("contains"));
-    for (var i=0; i<x.length; i++) {
-      var tx = x[i].object.uri;
-      if (! (/.*[0-9a-z]+$/).test(tx) ) continue;
-      console.log(tx);
-
-      //
-      //  process each file in directory
-      //
-      f.requestURI(tx,undefined,true, function(ok, body, xhr) {
-        var subject = $rdf.sym(tx + '#this');
-        var source      = g.any(subject, CURR('source'));
-        var destination = g.any(subject, CURR('destination'));
-        var amount      = g.any(subject, CURR('amount'));
-        var currency    = g.any(subject, CURR('currency'));
-        var comment     = g.any(subject, RDFS('comment'));
-
-        if (comment) {
-          comment = comment.value;
-        } else {
-          comment = 'vw';
-        }
+    if (message === 'pong') return;
 
 
-        console.log([source, destination, amount, currency, comment, tx, queue]);
+    ldpc = message.split(' ')[1].split(',')[0];
+
+    var g = $rdf.graph();
+    var f = $rdf.fetcher(g, TIMEOUT);
 
 
+    //
+    //  get directory
+    //
+    f.requestURI(ldpc,undefined,true, function(ok, body, xhr) {
+      console.log('tx fetched');
 
-        if (queue[tx]) {
-          console.log('already processed : ' + tx);
-          return;
-        }
-        if (!source || !destination || !amount || !currency) return;
-
-        queue[tx] = {id : tx};
-
-        var t = [source.value, amount.value, currency.value, destination.value, comment];
-        console.log(t);
-
+      var x = g.statementsMatching($rdf.sym(ldpc), LDP("contains"));
+      for (var i=0; i<x.length; i++) {
+        var tx = x[i].object.uri;
+        if (! (/.*[0-9a-z]+$/).test(tx) ) continue;
+        console.log(tx);
 
         //
-        //  withdraw
+        //  process each file in directory
         //
-        if (t[3].indexOf('bitmark:') === 0 || t[3].indexOf('bitcoin:') === 0) {
+        f.requestURI(tx,undefined,true, function(ok, body, xhr) {
+          var subject = $rdf.sym(tx + '#this');
+          var source      = g.any(subject, CURR('source'));
+          var destination = g.any(subject, CURR('destination'));
+          var amount      = g.any(subject, CURR('amount'));
+          var currency    = g.any(subject, CURR('currency'));
+          var comment     = g.any(subject, RDFS('comment'));
 
-          if (t[3].indexOf('bitmark:') === 0) {
-            command = 'bitmark-cli sendtoaddress ' + t[3].split(":")[1] + ' ' + ( parseFloat(t[1]) / 1000.0 );
-          }
-
-          if (t[3].indexOf('bitcoin:') === 0) {
-            command = 'bitcoin-cli sendtoaddress ' + t[3].split(":")[1] + ' ' + ( parseFloat(t[1]) / 1000.0 );
+          if (comment) {
+            comment = comment.value;
+          } else {
+            comment = 'vw';
           }
 
 
-          console.log(command);
-          exec(command, function(error, stdout, stderr) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-              console.log('exec error: ' + error);
-            }
-
-            callback = function(response) {
-
-              console.log(JSON.stringify(response.headers));
-
-              var str = '';
-              response.on('data', function (chunk) {
-                str += chunk;
-              });
-
-              response.on('end', function () {
-                console.log(str);
-              });
-            };
-
-            options.path = '/' + tx.split('/').splice(3).join('/');
-            console.log(options.path);
-            var req = https.request(options, callback);
-            //This is the data we are posting, it needs to be a string or a buffer
-            req.write('');
-            req.end();
-          });
+          console.log([source, destination, amount, currency, comment, tx, queue]);
 
 
-        //
-        //  pay
-        //
-        } else {
+
+          if (queue[tx]) {
+            console.log('already processed : ' + tx);
+            return;
+          }
+          if (!source || !destination || !amount || !currency) return;
+
+          queue[tx] = {id : tx};
+
+          var t = [source.value, amount.value, currency.value, destination.value, comment];
+          console.log(t);
 
 
           //
-          //  call insert
+          //  withdraw
           //
-          var command = "nodejs insert.js '"+t[0]+"' "+t[1]+" '"+t[2]+"' '"+t[3]+"' '"+t[4]+"'";
-          console.log(command);
-          exec(command, function(error, stdout, stderr) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-              console.log('exec error: ' + error);
+          if (t[3].indexOf('bitmark:') === 0 || t[3].indexOf('bitcoin:') === 0) {
+
+            if (t[3].indexOf('bitmark:') === 0) {
+              command = 'bitmark-cli sendtoaddress ' + t[3].split(":")[1] + ' ' + ( parseFloat(t[1]) / 1000.0 );
             }
 
-            callback = function(response) {
-
-              console.log(JSON.stringify(response.headers));
-
-              var str = '';
-              response.on('data', function (chunk) {
-                str += chunk;
-              });
-
-              response.on('end', function () {
-                console.log(str);
-              });
+            if (t[3].indexOf('bitcoin:') === 0) {
+              command = 'bitcoin-cli sendtoaddress ' + t[3].split(":")[1] + ' ' + ( parseFloat(t[1]) / 1000.0 );
+            }
 
 
-            };
+            console.log(command);
+            exec(command, function(error, stdout, stderr) {
+              console.log('stdout: ' + stdout);
+              console.log('stderr: ' + stderr);
+              if (error !== null) {
+                console.log('exec error: ' + error);
+              }
+
+              callback = function(response) {
+
+                console.log(JSON.stringify(response.headers));
+
+                var str = '';
+                response.on('data', function (chunk) {
+                  str += chunk;
+                });
+
+                response.on('end', function () {
+                  console.log(str);
+                });
+              };
+
+              options.path = '/' + tx.split('/').splice(3).join('/');
+              console.log(options.path);
+              var req = https.request(options, callback);
+              //This is the data we are posting, it needs to be a string or a buffer
+              req.write('');
+              req.end();
+            });
 
             //
-            //  then delete
+            //  pay
             //
-            options.path = '/' + tx.split('/').splice(3).join('/');
-            console.log(options.path);
-            var req = https.request(options, function(response) {
+          } else {
 
-              console.log(JSON.stringify(response.headers));
+            //
+            //  call insert
+            //
+            var command = "nodejs insert.js '"+t[0]+"' "+t[1]+" '"+t[2]+"' '"+t[3]+"' '"+t[4]+"'";
+            console.log(command);
+            exec(command, function(error, stdout, stderr) {
+              console.log('stdout: ' + stdout);
+              console.log('stderr: ' + stderr);
+              if (error !== null) {
+                console.log('exec error: ' + error);
+              }
 
-              var str = '';
-              response.on('data', function (chunk) {
-                str += chunk;
+              callback = function(response) {
+
+                console.log(JSON.stringify(response.headers));
+
+                var str = '';
+                response.on('data', function (chunk) {
+                  str += chunk;
+                });
+
+                response.on('end', function () {
+                  console.log(str);
+                });
+
+
+              };
+
+              //
+              //  then delete
+              //
+              options.path = '/' + tx.split('/').splice(3).join('/');
+              console.log(options.path);
+              var req = https.request(options, function(response) {
+
+                console.log(JSON.stringify(response.headers));
+
+                var str = '';
+                response.on('data', function (chunk) {
+                  str += chunk;
+                });
+
+                response.on('end', function () {
+                  console.log(str);
+                  console.log('file deleted');
+                  setTimeout(function(){
+
+                    //
+                    //  then call a hook
+                    //
+                    exec('./hook.sh ' + sha256(source.value), outputCommand(error, stdout, stderr));
+
+
+                  }, 500);
+                });
+
               });
-
-              response.on('end', function () {
-                console.log(str);
-                console.log('file deleted');
-                setTimeout(function(){
-
-                  //
-                  //  then call a hook
-                  //
-                  exec('./hook.sh ' + sha256(source.value), function(error, stdout, stderr) {
-                    console.log('stdout: ' + stdout);
-                    console.log('stderr: ' + stderr);
-                    if (error !== null) {
-                      console.log('exec error: ' + error);
-                    }
-                  });
-
-
-                }, 500);
-              });
-
+              //This is the data we are posting, it needs to be a string or a buffer
+              req.write('');
+              req.end();
 
             });
-            //This is the data we are posting, it needs to be a string or a buffer
-            req.write('');
-            req.end();
 
+          }
 
-          });
+        });
 
+      }
 
-
-        }
-
-
-      });
-
-    }
-
+    });
 
   });
 
 
-});
+}
