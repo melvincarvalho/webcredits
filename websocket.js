@@ -97,7 +97,6 @@ function daemon() {
 
 
 function subscribe(ldpc) {
-  if (isConnected) return;
 
   try {
     console.log('fetching user dirs from ' + ldpc);
