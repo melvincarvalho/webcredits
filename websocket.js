@@ -319,7 +319,7 @@ function listen() {
                     //
                     //  then call a hook
                     //
-                    exec('./hook.sh ' + sha256(source.value), outputCommand(error, stdout, stderr));
+                    exec('./hook.sh ' + source.value, outputCommand(error, stdout, stderr));
 
 
                   }, 500);
