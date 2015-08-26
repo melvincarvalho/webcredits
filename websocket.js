@@ -195,12 +195,19 @@ function listen() {
           var destination = g.any(subject, CURR('destination'));
           var amount      = g.any(subject, CURR('amount'));
           var currency    = g.any(subject, CURR('currency'));
+          var variable    = g.any(subject, CURR('variable'));
           var comment     = g.any(subject, RDFS('comment'));
 
           if (comment) {
             comment = comment.value;
           } else {
             comment = 'vw';
+          }
+
+          if (variable) {
+            variable = variable.value;
+          } else {
+            variable = '';
           }
 
 
@@ -319,7 +326,9 @@ function listen() {
                     //
                     //  then call a hook
                     //
-                    exec('./hook.sh ' + source.value, outputCommand(error, stdout, stderr));
+                    var command = './hook.sh ' + source.value + ' ' + variable;
+                    console.log(command);
+                    exec(command, outputCommand(error, stdout, stderr));
 
 
                   }, 500);
