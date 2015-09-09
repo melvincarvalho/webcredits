@@ -1,6 +1,6 @@
 <?php
 $db = new SQLite3('credit.db');
-$currency = 'https://w3id.org/cc#mark';
+$currency = 'https://w3id.org/cc#bit';
 
 $URI = $_REQUEST['uri'];
 
@@ -17,10 +17,9 @@ if ($row = $results->fetchArray()) {
   $j = new stdClass();
   $j->amount = $row['amount'];
   $j->{'@id'} = $URI;
-  $j->currency = 'https://w3id.org/cc#mark';
+  $j->currency = 'https://w3id.org/cc#bit';
   echo json_encode($j);
 } else {
   echo json_encode(0);
 }
 ?>
-
