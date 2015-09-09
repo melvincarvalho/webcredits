@@ -30,6 +30,10 @@ if (isset($_REQUEST['description'])) {
   $description = $_REQUEST['description'];
 }
 
+if (isset($_REQUEST['days'])) {
+  $days = $_REQUEST['days'];
+}
+
 
 /*
 * init
@@ -41,11 +45,16 @@ $db = new SQLite3($dbfile);
 * query
 */
 if ($uri) {
-  if ($description) {
-    $results = $db->query("select sum(amount) amount, DATE(timestamp) date from credit where destination = '$uri' and description = '$description' group by date order by date;");
-  } else {
-    $results = $db->query("select sum(amount) amount, DATE(timestamp) date from credit where destination = '$uri' group by date order by date;");
+  $query = "select sum(amount) amount, DATE(timestamp) date from credit where destination = '$uri'";
+  if (!empty($description)) {
+    $query .= " and description = '$description' ";
   }
+  if (!empty($days)) {
+    $query .= " and timestamp > datetime('now', '-$days days') ";
+  }
+  $query .= " group by date order by date;";
+  $results = $db->query($query);
+  error_log($query);
 }
 
 
