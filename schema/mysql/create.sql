@@ -1,4 +1,4 @@
-CREATE TABLE CREDIT (
+CREATE TABLE Credit (
   `@id` TEXT,
   `source` TEXT,
   `amount` REAL,
@@ -10,8 +10,16 @@ CREATE TABLE CREDIT (
   `wallet` TEXT
 );
 
-CREATE TABLE LEDGER (
+CREATE TABLE Ledger (
   `source` TEXT,
   `amount` REAL,
+  `currency` VARCHAR(255) DEFAULT 'https://w3id.org/cc#bit',
+  `wallet` TEXT
+);
+
+CREATE TABLE Genesis (
+  `source` TEXT,
+  `amount` REAL,
+  `currency` VARCHAR(255) DEFAULT 'https://w3id.org/cc#bit',
   `wallet` TEXT
 );
