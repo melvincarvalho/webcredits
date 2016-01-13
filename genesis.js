@@ -13,6 +13,10 @@ var coinbase = 'https://w3id.org/cc#coinbase';
 var currency = 'https://w3id.org/cc#bit';
 var initial  = 1000000;
 
+function query(connection, sql, callback) {
+
+}
+
 connection.query('Insert into Ledger values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', NULL );', function(err, rows, fields) {
   if (err) {
     console.error(err);
