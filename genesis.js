@@ -1,38 +1,90 @@
+#!/usr/bin/env node
+
 // requires
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : '',
-  database : 'webcredits'
-});
+var Sequelize = require('sequelize');
 
-connection.connect();
+/**
+ * setup database
+ * @param  {string} dialect type of db mysql|sqlite
+ * @param  {string} storage file used for sqlite, default ./credit.db
+ * @return {Object} sequelize db object
+ */
+function setupDB(config) {
+  var sequelize;
+  var defaultStorage = 'credit.db';
 
-var coinbase = 'https://w3id.org/cc#coinbase';
-var currency = 'https://w3id.org/cc#bit';
-var initial  = 1000000;
+  if (config.dialect === 'sqlite') {
+    if (!config.storage) {
+      config.storage = defaultStorage;
+    }
 
-function query(connection, sql, callback) {
-
+    sequelize = new Sequelize(config.database, config.username, config.password, {
+      host: config.host,
+      dialect: config.dialect,
+      storage: config.storage
+    });
+  } else {
+    sequelize = new Sequelize(config.database, config.username, config.password, {
+      host: config.host,
+      dialect: config.dialect
+    });
+  }
+  return sequelize;
 }
 
-connection.query('Insert into Ledger values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', NULL );', function(err, rows, fields) {
-  if (err) {
-    console.error(err);
-  }
 
-  console.log('Ledger setup successful');
-});
+/**
+* create tables
+ * @param  {Object} sequelize db object
+ */
+function genesisInit(sequelize) {
+  var coinbase = 'https://w3id.org/cc#coinbase';
+  var currency = 'https://w3id.org/cc#bit';
+  var initial  = 1000000;
+
+  var coinbaseSql = 'Insert into Ledger values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', NULL );';
+
+  var genesisSql = 'Insert into Genesis values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', NULL );';
+
+  sequelize.query(coinbaseSql).then(function(res) {
+  }).then(function(){
+    sequelize.query(genesisSql);
+  }).then(function(){
+    console.log('Genesis successful!');
+  }).catch(function(err){
+    console.log('Genesis Failed.', err);
+  }).then(function() {
+    console.log('Complete');
+  });
+}
+
+/**
+ * genesis function
+ * @param  {Object} config [description]
+ */
+function genesis(config) {
+  // vars
+  var sequelize;
+
+  // run main
+  sequelize = setupDB(config);
+  genesisInit(sequelize);
+}
 
 
-connection.query('Insert into Genesis values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', NULL );', function(err, rows, fields) {
-  if (err) {
-    console.error(err);
-  }
+/**
+ * version as a command
+ */
+function bin(argv) {
+  // setup config
+  var config = require('./dbconfig.js');
 
-  console.log('Genesis successful');
-});
+  genesis(config);
+}
 
+// If one import this file, this is a module, otherwise a library
+if (require.main === module) {
+  bin(process.argv);
+}
 
-connection.end();
+module.exports = genesis;
