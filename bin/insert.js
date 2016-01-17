@@ -47,19 +47,19 @@ function insert(credit, sequelize) {
   console.log('amount : ' + credit["https://w3id.org/cc#amount"]);
   console.log('unit : ' + credit["https://w3id.org/cc#currency"]);
   console.log('destination : ' + credit["https://w3id.org/cc#destination"]);
-  console.log('description : ' + credit.description);
-  console.log('timestamp : ' + credit.timestamp);
+  console.log('description : ' + credit["http://purl.org/dc/terms/description"]);
+  console.log('timestamp : ' + credit["https://w3id.org/cc#created"]);
 
 
   // check if exists and build query
   var existsSql = "SELECT * FROM Credit where source = '"+ credit["https://w3id.org/cc#source"] + "' and destination = '" + credit["https://w3id.org/cc#destination"] + "' and amount = " + credit["https://w3id.org/cc#amount"];
-  if ( credit.description ) {
-    existsSql +=  " and description = '" + credit.description + "'";
+  if ( credit["http://purl.org/dc/terms/description"] ) {
+    existsSql +=  " and description = '" + credit["http://purl.org/dc/terms/description"] + "'";
   } else {
     existsSql +=  " and description = null";
   }
-  if ( credit.timestamp ) {
-    existsSql +=  " and timestamp = '" + credit.timestamp + "'";
+  if ( credit["https://w3id.org/cc#created"] ) {
+    existsSql +=  " and timestamp = '" + credit["https://w3id.org/cc#created"] + "'";
   } else {
     existsSql +=  " and timestamp = null";
   }
@@ -86,18 +86,18 @@ function insert(credit, sequelize) {
         console.log('funds available');
 
 
-        if (credit.timestamp) {
-          credit.timestamp = credit.timestamp.replace(' ', 'T');
-          if (credit.timestamp.charAt(credit.timestamp.length-1) != 'Z') {
-            credit.timestamp += 'Z';
+        if (credit["https://w3id.org/cc#created"]) {
+          credit["https://w3id.org/cc#created"] = credit["https://w3id.org/cc#created"].replace(' ', 'T');
+          if (credit["https://w3id.org/cc#created"].charAt(credit["https://w3id.org/cc#created"].length-1) != 'Z') {
+            credit["https://w3id.org/cc#created"] += 'Z';
           }
         } else {
-          credit.timestamp = new Date().toISOString();
+          credit["https://w3id.org/cc#created"] = new Date().toISOString();
         }
 
 
         var doc = {
-          "https://w3id.org/cc#created": { "@value" : credit.timestamp, "@type" : "http://www.w3.org/2001/XMLSchema#dateTime" } ,
+          "https://w3id.org/cc#created": { "@value" : credit["https://w3id.org/cc#created"], "@type" : "http://www.w3.org/2001/XMLSchema#dateTime" } ,
           "https://w3id.org/cc#source": { "@id": credit["https://w3id.org/cc#source"] },
           "https://w3id.org/cc#amount": { "@value" : credit["https://w3id.org/cc#amount"], "@type" : "http://www.w3.org/2001/XMLSchema#decimal" } ,
           "https://w3id.org/cc#destination": { "@id": credit["https://w3id.org/cc#destination"] },
@@ -118,14 +118,8 @@ function insert(credit, sequelize) {
     var hash = crypto.createHash('sha256').update(doc).digest('base64');
     console.log(hash);
 
-    // helper functions
-    function base64url_encode(data) {
-      return btoa(data);
-    }
-
     var id = 'ni:///sha-256;' + new Buffer(hash).toString('base64').replace('+', '-').replace('/', '_').replace('=', '');
     credit['@id'] = id;
-    console.log('doc');
     console.log(credit);
 
   }).catch(function(err){
@@ -158,20 +152,20 @@ function bin(argv) {
 
   var credit = {};
 /*
-  "https://w3id.org/cc#created": { "@value" : credit.timestamp, "@type" : "http://www.w3.org/2001/XMLSchema#dateTime" } ,
+  "https://w3id.org/cc#created": { "@value" : credit["https://w3id.org/cc#created"], "@type" : "http://www.w3.org/2001/XMLSchema#dateTime" } ,
   "https://w3id.org/cc#source": { "@id": credit["https://w3id.org/cc#source"] },
   "https://w3id.org/cc#amount": { "@value" : credit["https://w3id.org/cc#amount"], "@type" : "http://www.w3.org/2001/XMLSchema#decimal" } ,
   "https://w3id.org/cc#destination": { "@id": credit["https://w3id.org/cc#destination"] },
   "https://w3id.org/cc#currency": { "@id": credit["https://w3id.org/cc#currency"] },
   "@type": "https://w3id.org/cc#Credit"
 */
-
-  credit["https://w3id.org/cc#source"]      = argv[2];
-  credit["https://w3id.org/cc#amount"]      = argv[3];
-  credit["https://w3id.org/cc#currency"]    = argv[4];
-  credit["https://w3id.org/cc#destination"] = argv[5];
-  credit.description = argv[6];
-  credit.timestamp   = argv[7];
+  credit["@type"]                                = 'https://w3id.org/cc#Credit';
+  credit["https://w3id.org/cc#source"]           = argv[2];
+  credit["https://w3id.org/cc#amount"]           = argv[3];
+  credit["https://w3id.org/cc#currency"]         = argv[4];
+  credit["https://w3id.org/cc#destination"]      = argv[5];
+  credit["http://purl.org/dc/terms/description"] = argv[6];
+  credit["https://w3id.org/cc#created"]          = argv[7];
 
 
   // clean and validate
