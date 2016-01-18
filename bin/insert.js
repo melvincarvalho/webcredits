@@ -7,11 +7,11 @@ var crypto = require('crypto');
 var promises = jsonld.promises;
 
 /**
- * setup database
- * @param  {string} dialect type of db mysql|sqlite
- * @param  {string} storage file used for sqlite, default ./credit.db
- * @return {Object} sequelize db object
- */
+* setup database
+* @param  {string} dialect type of db mysql|sqlite
+* @param  {string} storage file used for sqlite, default ./credit.db
+* @return {Object} sequelize db object
+*/
 function setupDB(config) {
   var sequelize;
   var defaultStorage = 'credit.db';
@@ -37,9 +37,9 @@ function setupDB(config) {
 
 
 /**
- * insert credit
- * @param  {Object} sequelize db object
- */
+* insert credit
+* @param  {Object} sequelize db object
+*/
 function insert(credit, sequelize) {
 
   // main
@@ -86,13 +86,13 @@ function insert(credit, sequelize) {
         console.log('funds available');
 
 
-        if (credit["https://w3id.org/cc#created"]) {
-          credit["https://w3id.org/cc#created"] = credit["https://w3id.org/cc#created"].replace(' ', 'T');
-          if (credit["https://w3id.org/cc#created"].charAt(credit["https://w3id.org/cc#created"].length-1) != 'Z') {
-            credit["https://w3id.org/cc#created"] += 'Z';
+        if (credit["https://w3id.org/cc#timestamp"]) {
+          credit["https://w3id.org/cc#timestamp"] = credit["https://w3id.org/cc#timestamp"].replace(' ', 'T');
+          if (credit["https://w3id.org/cc#timestamp"].charAt(credit["https://w3id.org/cc#timestamp"].length-1) != 'Z') {
+            credit["https://w3id.org/cc#timestamp"] += 'Z';
           }
         } else {
-          credit["https://w3id.org/cc#created"] = new Date().toISOString();
+          credit["https://w3id.org/cc#timestamp"] = new Date().toISOString();
         }
 
 
@@ -122,17 +122,50 @@ function insert(credit, sequelize) {
     credit['@id'] = id;
     console.log(credit);
 
-  }).catch(function(err){
-    console.log('Failed to insert credit.', err);
+
+
+    var insertSql = "INSERT INTO Credit(\`@id\`, `source`, `destination`, `amount`, `timestamp`, `currency`";
+    if (credit["https://w3id.org/cc#description"]) insertSql += ", `description`";
+    insertSql += ") values ( '" + credit['@id'] + "', '"+ credit["https://w3id.org/cc#source"] + "' , '" + credit["https://w3id.org/cc#destination"] + "' , " + credit["https://w3id.org/cc#amount"];
+    insertSql += " , '" + credit["https://w3id.org/cc#timestamp"] + "'" + " , '" + credit["https://w3id.org/cc#amount"] + "'";
+    if (credit["http://purl.org/dc/terms/description"]) insertSql+= " , '" + credit["http://purl.org/dc/terms/description"] + "'";
+    insertSql += " )";
+
+    console.log(insertSql);
+
+    return sequelize.query(insertSql);
+
+  }).then(function(res){
+    console.log('decrementing source');
+    var decrementSql = "UPDATE Ledger set amount = amount - " + credit["https://w3id.org/cc#amount"] + " where source = '"+ credit["https://w3id.org/cc#source"] + "' ";
+    return sequelize.query(decrementSql);
+
+  }).then(function(res){
+    console.log('incrementing or creating destination');
+    var checkSql = "SELECT * from Ledger where `source` =  '" + credit["https://w3id.org/cc#destination"] + "'";
+    return sequelize.query(checkSql);
+  }).then(function(res){
+    var incrementSql;
+    if (res[0][0] && res[0][0].amount) {
+      incrementSql = "UPDATE Ledger set `amount` = `amount` + " + credit["https://w3id.org/cc#amount"] + " where `source` =  '" + credit["https://w3id.org/cc#destination"] + "'";
+    } else {
+      incrementSql = "INSERT into Ledger (`source`, `amount`) values ('"+ credit["https://w3id.org/cc#destination"] +"', "+credit["https://w3id.org/cc#amount"] +")";
+    }
+    return sequelize.query(incrementSql);
+
   }).then(function() {
     console.log('Complete');
+    // hook
+
+  }).catch(function(err){
+    console.log('Failed to insert credit.', err);
   });
 }
 
 /**
- * createDB function
- * @param  {Object} config [description]
- */
+* createDB function
+* @param  {Object} config [description]
+*/
 function createDB(config) {
   // vars
   var sequelize;
@@ -144,28 +177,21 @@ function createDB(config) {
 
 
 /**
- * version as a command
- */
+* version as a command
+*/
 function bin(argv) {
   // setup config
   var config = require('./dbconfig.js');
 
   var credit = {};
-/*
-  "https://w3id.org/cc#created": { "@value" : credit["https://w3id.org/cc#created"], "@type" : "http://www.w3.org/2001/XMLSchema#dateTime" } ,
-  "https://w3id.org/cc#source": { "@id": credit["https://w3id.org/cc#source"] },
-  "https://w3id.org/cc#amount": { "@value" : credit["https://w3id.org/cc#amount"], "@type" : "http://www.w3.org/2001/XMLSchema#decimal" } ,
-  "https://w3id.org/cc#destination": { "@id": credit["https://w3id.org/cc#destination"] },
-  "https://w3id.org/cc#currency": { "@id": credit["https://w3id.org/cc#currency"] },
-  "@type": "https://w3id.org/cc#Credit"
-*/
+
   credit["@type"]                                = 'https://w3id.org/cc#Credit';
   credit["https://w3id.org/cc#source"]           = argv[2];
   credit["https://w3id.org/cc#amount"]           = argv[3];
   credit["https://w3id.org/cc#currency"]         = argv[4];
   credit["https://w3id.org/cc#destination"]      = argv[5];
   credit["http://purl.org/dc/terms/description"] = argv[6];
-  credit["https://w3id.org/cc#created"]          = argv[7];
+  credit["https://w3id.org/cc#timestamp"]        = argv[7];
 
 
   // clean and validate
@@ -199,175 +225,3 @@ if (require.main === module) {
 }
 
 module.exports = insert;
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-db.serialize(function() {
-
-  // check if exists and build query
-  var sql = "SELECT * FROM credit where source = '"+ source + "' and destination = '" + destination + "' and amount = " + amount
-  if ( description ) {
-    sql +=  " and description = '" + description + "'";
-  } else {
-    sql +=  " and description = null";
-  }
-  if ( timestamp ) {
-    sql +=  " and timestamp = '" + timestamp + "'";
-  } else {
-    sql +=  " and timestamp = null";
-  }
-  console.log(sql);
-  db.each(sql, function(err, row) {
-    if (err) {
-      console.log(err);
-    }
-  }, function(err, numrows) {
-
-    if (err) {
-      console.log(err);
-      process.exit(-1);
-    } else if (numrows > 0) {
-      // if exists exit
-      console.log('row already exists');
-      process.exit(-1);
-    } else {
-      // we have a new row, check for funds
-
-      console.log('checking balance');
-      var sql = "SELECT * FROM ledger where source = '" + source + "'";
-      console.log(sql);
-      db.each(sql, function(err, row) {
-        if (err) {
-          console.log(err);
-          process.exit(-1);
-        } else {
-          var balance = row.amount;
-          console.log('balance is : ' + balance);
-          if ( balance < amount ) {
-            console.log("sorry, not enough funds");
-            process.exit(-1);
-          }
-        }
-      }, function(err, numrows){
-        if (err) {
-          console.log(err);
-          process.exit(-1);
-        } else if (numrows === 0) {
-          console.log('no entry in ledger');
-          process.exit(-1);
-        } else {
-          // we have funds so lets make a credit and update ledger
-          console.log('adding to credits');
-
-          if (timestamp) {
-            timestamp = timestamp.replace(' ', 'T');
-            if (timestamp.charAt(timestamp.length-1) != 'Z') {
-              timestamp += 'Z';
-            }
-          } else {
-            timestamp = new Date().toISOString();
-          }
-
-
-          var doc = {
-            "https://w3id.org/cc#created": { "@value" : timestamp, "@type" : "http://www.w3.org/2001/XMLSchema#dateTime" } ,
-            "https://w3id.org/cc#source": { "@id": source },
-            "https://w3id.org/cc#amount": { "@value" : amount, "@type" : "http://www.w3.org/2001/XMLSchema#decimal" } ,
-            "https://w3id.org/cc#destination": { "@id": destination },
-            "https://w3id.org/cc#currency": { "@id": unit },
-            "@type": "https://w3id.org/cc#Credit"
-          };
-
-          jsonld.normalize(doc, {format: 'application/nquads'}, function(err, normalized) {
-
-            // normalized is a string that is a canonical representation of the document
-            // that can be used for hashing
-            //console.log(normalized);
-
-            var hash = crypto.createHash('sha256').update(normalized).digest('base64');
-            //console.log(hash);
-
-            // helper functions
-            function base64url_encode(data) {
-              return btoa(data);
-            }
-
-
-            var id = 'ni:///sha-256;' + new Buffer(hash).toString('base64').replace('+', '-').replace('/', '_').replace('=', '');
-            doc['@id'] = id;
-            console.log(doc);
-
-
-
-            var sql = "INSERT INTO credit(\"@id\", 'source', 'destination', 'amount', 'timestamp', 'currency'";
-            if (description) sql += ", 'description'";
-            sql += ") values ( '" + id + "', '"+ source + "' , '" + destination + "' , " + amount;
-            sql += " , '" + timestamp + "'" + " , '" + unit + "'";
-            if (description) sql+= " , '" + description + "'";
-            sql += " )";
-
-
-            console.log(sql);
-            db.run(sql);
-
-            // decrement source
-            console.log('decrement source');
-            var sql = "UPDATE ledger set amount = amount - " + amount + " where source = '"+ source + "' ";
-            console.log(sql);
-            db.run(sql);
-
-            // increment or add destination
-            console.log('increment or add destination');
-            var sql = "SELECT * FROM ledger where source= '" + destination + "'";
-            console.log(sql);
-            db.each(sql, function(){}, function(err, numrows){
-              console.log('numrows : ' + numrows);
-              if (numrows > 0 ) {
-                var sql = "UPDATE ledger set amount = amount + " + amount + " where source = '"+ destination + "' ";
-              } else {
-                var sql = "INSERT INTO ledger  ('source', 'amount') VALUES  ( '" + destination + "', " + amount + " ) ";
-              }
-              console.log(sql);
-              db.run(sql);
-
-            });
-
-          });
-
-
-        }
-
-      });
-
-    }
-
-  });
-
-});
-*/
