@@ -162,6 +162,7 @@ function insert(credit, sequelize, config) {
 
   }).then(function() {
     console.log('Complete');
+    sequelize.close();
     // hook
 
   }).catch(function(err){
