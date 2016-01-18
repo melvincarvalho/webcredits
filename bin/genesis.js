@@ -37,18 +37,21 @@ function setupDB(config) {
 * create tables
  * @param  {Object} sequelize db object
  */
-function genesisInit(sequelize) {
+function genesisInit(sequelize, config) {
   var coinbase = 'https://w3id.org/cc#coinbase';
   var currency = 'https://w3id.org/cc#bit';
   var initial  = 1000000;
 
-  var coinbaseSql = 'Insert into Ledger values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', NULL );';
+  if (!config.wallet) {
+    config.wallet = null;    
+  }
 
-  var genesisSql = 'Insert into Genesis values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', NULL );';
+  var coinbaseSql = 'Insert into Ledger values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', :wallet );';
+  var genesisSql  = 'Insert into Genesis values ( \''+ coinbase +'\', '+ initial +', \''+ currency +'\', :wallet );';
 
-  sequelize.query(coinbaseSql).then(function(res) {
+  sequelize.query(coinbaseSql,  { replacements: { wallet: config.wallet } }).then(function(res) {
   }).then(function(){
-    sequelize.query(genesisSql);
+    sequelize.query(genesisSql,  { replacements: { wallet: config.wallet } });
   }).then(function(){
     console.log('Genesis successful!');
   }).catch(function(err){
@@ -68,7 +71,7 @@ function genesis(config) {
 
   // run main
   sequelize = setupDB(config);
-  genesisInit(sequelize);
+  genesisInit(sequelize, config);
 }
 
 
