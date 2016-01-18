@@ -127,7 +127,7 @@ function insert(credit, sequelize) {
     var insertSql = "INSERT INTO Credit(\`@id\`, `source`, `destination`, `amount`, `timestamp`, `currency`";
     if (credit["https://w3id.org/cc#description"]) insertSql += ", `description`";
     insertSql += ") values ( '" + credit['@id'] + "', '"+ credit["https://w3id.org/cc#source"] + "' , '" + credit["https://w3id.org/cc#destination"] + "' , " + credit["https://w3id.org/cc#amount"];
-    insertSql += " , '" + credit["https://w3id.org/cc#timestamp"] + "'" + " , '" + credit["https://w3id.org/cc#amount"] + "'";
+    insertSql += " , '" + credit["https://w3id.org/cc#timestamp"] + "'" + " , '" + credit["https://w3id.org/cc#currency"] + "'";
     if (credit["http://purl.org/dc/terms/description"]) insertSql+= " , '" + credit["http://purl.org/dc/terms/description"] + "'";
     insertSql += " )";
 
