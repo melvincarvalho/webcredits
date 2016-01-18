@@ -42,10 +42,10 @@ function setupDB(config) {
 
 
 /**
-* create tables
+ * get reputation
  * @param  {Object} sequelize db object
  */
-function getBalance(source, sequelize, config) {
+function getReputation(source, sequelize, config) {
   var coinbase = 'https://w3id.org/cc#coinbase';
   var currency = 'https://w3id.org/cc#bit';
   var initial  = 1000000;
@@ -54,12 +54,12 @@ function getBalance(source, sequelize, config) {
     config.wallet = null;
   }
 
-  var coinbaseSql = 'Select amount from Ledger where source = :source and wallet = :wallet ;';
+  var coinbaseSql = 'Select sum(amount) amount from Credit where destination = :source and wallet = :wallet ;';
 
   sequelize.query(coinbaseSql,  { replacements: { wallet: config.wallet, source: source } }).then(function(res) {
     return res;
   }).catch(function(err){
-    console.log('Balance Failed.', err);
+    console.log('Reputation Failed.', err);
   }).then(function(res) {
     if (res[0][0]) {
       console.log(res[0][0].amount);
@@ -69,16 +69,16 @@ function getBalance(source, sequelize, config) {
 }
 
 /**
- * balance function
+ * reputation function
  * @param  {Object} config [description]
  */
-function balance(source, config) {
+function reputation(source, config) {
   // vars
   var sequelize;
 
   // run main
   sequelize = setupDB(config);
-  var res = getBalance(source, sequelize, config);
+  var res = getReputation(source, sequelize, config);
 }
 
 
@@ -96,7 +96,7 @@ function bin(argv) {
     process.exit(-1);
   }
 
-  balance(source, config);
+  reputation(source, config);
 }
 
 // If one import this file, this is a module, otherwise a library
@@ -104,4 +104,4 @@ if (require.main === module) {
   bin(process.argv);
 }
 
-module.exports = balance;
+module.exports = reputation;
