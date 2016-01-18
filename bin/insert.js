@@ -40,7 +40,7 @@ function setupDB(config) {
 * insert credit
 * @param  {Object} sequelize db object
 */
-function insert(credit, sequelize) {
+function insert(credit, sequelize, config) {
 
   // main
   console.log('source : ' + credit["https://w3id.org/cc#source"]);
@@ -49,25 +49,22 @@ function insert(credit, sequelize) {
   console.log('destination : ' + credit["https://w3id.org/cc#destination"]);
   console.log('description : ' + credit["http://purl.org/dc/terms/description"]);
   console.log('timestamp : ' + credit["https://w3id.org/cc#created"]);
+  console.log('wallet : ' + config.wallet);
 
 
-  // check if exists and build query
+  credit["http://purl.org/dc/terms/description"] = credit["http://purl.org/dc/terms/description"] || null;
+  credit["http://purl.org/dc/terms/created"] = credit["http://purl.org/dc/terms/created"] || null;
+  config.wallet = config.wallet || null;
+
   var existsSql = "SELECT * FROM Credit where source = '"+ credit["https://w3id.org/cc#source"] + "' and destination = '" + credit["https://w3id.org/cc#destination"] + "' and amount = " + credit["https://w3id.org/cc#amount"];
-  if ( credit["http://purl.org/dc/terms/description"] ) {
-    existsSql +=  " and description = '" + credit["http://purl.org/dc/terms/description"] + "'";
-  } else {
-    existsSql +=  " and description = null";
-  }
-  if ( credit["https://w3id.org/cc#created"] ) {
-    existsSql +=  " and timestamp = '" + credit["https://w3id.org/cc#created"] + "'";
-  } else {
-    existsSql +=  " and timestamp = null";
-  }
+  existsSql +=  " and description = :description ";
+  existsSql +=  " and timestamp = :created ";
+  existsSql +=  " and wallet = :wallet ";
+
   console.log(existsSql);
 
-  //existsSql = 'select 1 + 1';
-
-  sequelize.query(existsSql).then(function(res) {
+  sequelize.query(existsSql, { replacements: { description: credit["http://purl.org/dc/terms/description"],
+                               created: credit["http://purl.org/dc/terms/created"], wallet: config.wallet } }).then(function(res) {
     console.log('checking if row exists');
     console.log(res);
     if (res[0][0]) {
@@ -76,8 +73,8 @@ function insert(credit, sequelize) {
     } else {
       console.log('row does not exist');
       console.log('Getting balance');
-      var balanceSql = "SELECT * FROM Ledger where source = '" + credit["https://w3id.org/cc#source"] + "'";
-      return sequelize.query(balanceSql);
+      var balanceSql = "SELECT * FROM Ledger where source = '" + credit["https://w3id.org/cc#source"] + "' and wallet = :wallet ";
+      return sequelize.query(balanceSql, { replacements: { wallet: config.wallet } });
     }
   }).then(function(res){
     if (res[0][0] && res[0][0].amount) {
@@ -126,9 +123,11 @@ function insert(credit, sequelize) {
 
     var insertSql = "INSERT INTO Credit(\`@id\`, `source`, `destination`, `amount`, `timestamp`, `currency`";
     if (credit["https://w3id.org/cc#description"]) insertSql += ", `description`";
+    if (config.wallet) insertSql += ", `wallet`";
     insertSql += ") values ( '" + credit['@id'] + "', '"+ credit["https://w3id.org/cc#source"] + "' , '" + credit["https://w3id.org/cc#destination"] + "' , " + credit["https://w3id.org/cc#amount"];
     insertSql += " , '" + credit["https://w3id.org/cc#timestamp"] + "'" + " , '" + credit["https://w3id.org/cc#currency"] + "'";
     if (credit["http://purl.org/dc/terms/description"]) insertSql+= " , '" + credit["http://purl.org/dc/terms/description"] + "'";
+    if (config.wallet) insertSql+= " , '" + config.wallet + "'";
     insertSql += " )";
 
     console.log(insertSql);
@@ -137,19 +136,27 @@ function insert(credit, sequelize) {
 
   }).then(function(res){
     console.log('decrementing source');
-    var decrementSql = "UPDATE Ledger set amount = amount - " + credit["https://w3id.org/cc#amount"] + " where source = '"+ credit["https://w3id.org/cc#source"] + "' ";
-    return sequelize.query(decrementSql);
+    var decrementSql = "UPDATE Ledger set amount = amount - " + credit["https://w3id.org/cc#amount"] + " where source = '"+ credit["https://w3id.org/cc#source"] + "' and wallet = :wallet";
+    return sequelize.query(decrementSql, { replacements: { wallet: config.wallet } });
 
   }).then(function(res){
     console.log('incrementing or creating destination');
-    var checkSql = "SELECT * from Ledger where `source` =  '" + credit["https://w3id.org/cc#destination"] + "'";
-    return sequelize.query(checkSql);
+    var checkSql = "SELECT * from Ledger where `source` =  '" + credit["https://w3id.org/cc#destination"] + "' and wallet = :wallet";
+    return sequelize.query(checkSql, { replacements: { wallet: config.wallet } });
   }).then(function(res){
     var incrementSql;
     if (res[0][0] && res[0][0].amount) {
-      incrementSql = "UPDATE Ledger set `amount` = `amount` + " + credit["https://w3id.org/cc#amount"] + " where `source` =  '" + credit["https://w3id.org/cc#destination"] + "'";
+      if (config.wallet) {
+        incrementSql = "UPDATE Ledger set `amount` = `amount` + " + credit["https://w3id.org/cc#amount"] + " where `source` =  '" + credit["https://w3id.org/cc#destination"] + "' and wallet = '"+ config.wallet +"'";
+      } else {
+        incrementSql = "UPDATE Ledger set `amount` = `amount` + " + credit["https://w3id.org/cc#amount"] + " where `source` =  '" + credit["https://w3id.org/cc#destination"] + "'";
+      }
     } else {
-      incrementSql = "INSERT into Ledger (`source`, `amount`) values ('"+ credit["https://w3id.org/cc#destination"] +"', "+credit["https://w3id.org/cc#amount"] +")";
+      if (config.wallet) {
+        incrementSql = "INSERT into Ledger (`source`, `amount`, `wallet`) values ('"+ credit["https://w3id.org/cc#destination"] +"', "+credit["https://w3id.org/cc#amount"] +", '"+ config.wallet +"')";
+      } else {
+        incrementSql = "INSERT into Ledger (`source`, `amount`) values ('"+ credit["https://w3id.org/cc#destination"] +"', "+credit["https://w3id.org/cc#amount"] +")";
+      }
     }
     return sequelize.query(incrementSql);
 
@@ -215,7 +222,7 @@ function bin(argv) {
   }
 
   var sequelize = createDB(config);
-  insert(credit, sequelize);
+  insert(credit, sequelize, config);
 
 }
 
