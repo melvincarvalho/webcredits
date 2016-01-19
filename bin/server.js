@@ -58,9 +58,6 @@ function startServer(sequelize, config) {
 
   app.get('/balance', function (req, res) {
 
-    var coinbase = 'https://w3id.org/cc#coinbase';
-    var currency = 'https://w3id.org/cc#bit';
-    var initial  = 1000000;
     var source   = req.query.source;
 
     if (!source) {
@@ -72,16 +69,19 @@ function startServer(sequelize, config) {
       config.wallet = null;
     }
 
-    var coinbaseSql = 'Select amount from Ledger where source = :source and wallet = :wallet ;';
+    var balanceSql = 'Select amount from Ledger where source = :source and wallet = :wallet ;';
 
-    sequelize.query(coinbaseSql,  { replacements: { wallet: config.wallet, source: source } }).then(function(bal) {
+    sequelize.query(balanceSql,  { replacements: { wallet: config.wallet, source: source } }).then(function(bal) {
       return bal;
     }).catch(function(err){
       console.log('Balance Failed.', err);
     }).then(function(bal) {
       if (bal[0][0]) {
         console.log('balance for ' + source + ' : ' + bal[0][0].amount);
-        res.send('balance for ' + source + ' : ' + bal[0][0].amount);
+        var amount = Math.round(  bal[0][0].amount * 10) / 10.0;
+        var turtle = '<' + source + '> <https://w3id.org/cc#amount> ' + amount + '.0 .\n';
+        res.setHeader('Content-Type', 'text/turtle');
+        res.send(turtle);
       }
     });
 
