@@ -103,6 +103,50 @@ function startServer(sequelize, config) {
     });
   });
 
+  app.get('/tx', function (req, res) {
+
+    var max = 25;
+    var wallet   = req.query.wallet;
+
+    if (!wallet) {
+      wallet = config.wallet;
+    }
+
+    if (!wallet) {
+      res.send('wallet required');
+      return;
+    }
+
+    var source   = req.query.source;
+
+    if (!source) {
+      res.send('source required');
+      return;
+    }
+
+
+    var walletsSql = 'SELECT DISTINCT * from Credits where wallet = :wallet and ( source = :source or destination = :source )';
+
+    sequelize.query(walletsSql,  { replacements: { wallet: wallet, source: source } }).then(function(bal) {
+      if (bal[0][0]) {
+        var turtle = '';
+        res.setHeader('Content-Type', 'text/turtle');
+        for (var i = 0; i < bal[0].length; i++) {
+          if (i===max) {
+            return;
+          }
+          turtle += '<' + bal[0][i].source + '> <https://w3id.org/cc#amount> ' + bal[0][i].amount + ' .\n';
+        }
+        res.send(turtle);
+      } else {
+        res.send('no tx found');
+      }
+    }).catch(function(err){
+      console.log('Getting tx Failed.', err);
+      res.send('no tx found');
+    });
+  });
+
   app.get('/balance', function (req, res) {
 
     var source   = req.query.source;
@@ -141,12 +185,6 @@ function startServer(sequelize, config) {
   app.get('/insert', function (req, res) {
 
     res.send('insert');
-
-  });
-
-  app.get('/tx', function (req, res) {
-
-    res.send('tx');
 
   });
 
