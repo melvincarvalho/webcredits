@@ -25,7 +25,7 @@ function setupDB(config) {
       host: config.host,
       dialect: config.dialect,
       storage: config.storage,
-      logging: false,
+      logging: true,
 
       pool: false
 
@@ -34,7 +34,7 @@ function setupDB(config) {
     sequelize = new Sequelize(config.database, config.username, config.password, {
       host: config.host,
       dialect: config.dialect,
-      logging: false,
+      logging: true,
 
       pool: false
 
@@ -125,17 +125,40 @@ function startServer(sequelize, config) {
     }
 
 
-    var walletsSql = 'SELECT DISTINCT * from Credits where wallet = :wallet and ( source = :source or destination = :source )';
+    var walletsSql = 'SELECT DISTINCT * from Credit where wallet = :wallet and ( source = :source or destination = :source )';
 
     sequelize.query(walletsSql,  { replacements: { wallet: wallet, source: source } }).then(function(bal) {
       if (bal[0][0]) {
         var turtle = '';
+        /*
+        { '@id': 'ni:///sha-256;clN5SmgrdDExd2lqNG5qMzFxaUlBYi92N1VObTVUSU1WUWJMVG1Lc0RSaz0',
+  source: 'https://workbot.databox.me/profile/card#me',
+  amount: 5,
+  currency: 'https://w3id.org/cc#bit',
+  destination: 'http://melvincarvalho.com/#me',
+  timestamp: Wed Jan 20 2016 10:52:55 GMT+0100 (CET),
+  context: null,
+  description: null,
+  wallet: 'https://localhost/wallet/inartes#this' } ] ]
+
+         */
         res.setHeader('Content-Type', 'text/turtle');
         for (var i = 0; i < bal[0].length; i++) {
           if (i===max) {
-            return;
+            break;
           }
-          turtle += '<' + bal[0][i].source + '> <https://w3id.org/cc#amount> ' + bal[0][i].amount + ' .\n';
+          turtle += '<' + bal[0][i]['@id'] + '> a <https://w3id.org/cc#Credit> ; \n';
+          turtle += '  <https://w3id.org/cc#amount> ' + bal[0][i].amount + ' ;\n';
+          turtle += '  <https://w3id.org/cc#source> <' + bal[0][i].source + '> ;\n';
+          turtle += '  <https://w3id.org/cc#destination> <' + bal[0][i].destination + '> ;\n';
+          turtle += '  <https://w3id.org/cc#created> <' + bal[0][i].timestamp + '> ;\n';
+          if (bal[0][i].context) {
+            turtle += '  <https://w3id.org/cc#context> <' + bal[0][i].context + '> ;\n';
+          }
+          if (bal[0][i].description) {
+            turtle += '  <https://w3id.org/cc#description> <' + bal[0][i].description + '> ;\n';
+          }
+          turtle += '  <https://w3id.org/cc#currency> <' + bal[0][i].currency + '> .\n';
         }
         res.send(turtle);
       } else {
