@@ -7,11 +7,11 @@ var express = require('express');
 var app = express();
 
 /**
- * setup database
- * @param  {string} dialect type of db mysql|sqlite
- * @param  {string} storage file used for sqlite, default ./credit.db
- * @return {Object} sequelize db object
- */
+* setup database
+* @param  {string} dialect type of db mysql|sqlite
+* @param  {string} storage file used for sqlite, default ./credit.db
+* @return {Object} sequelize db object
+*/
 function setupDB(config) {
   var sequelize;
   var defaultStorage = 'credit.db';
@@ -45,15 +45,62 @@ function setupDB(config) {
 
 
 /**
- * start server
- * @param  {Object} sequelize db object
- */
+* start server
+* @param  {Object} sequelize db object
+*/
 function startServer(sequelize, config) {
+
   app.get('/', function (req, res) {
     var ret = '';
 
-    res.send('main');
+    var walletsSql = 'SELECT DISTINCT wallet from Ledger';
 
+    sequelize.query(walletsSql,  { replacements: { } }).then(function(bal) {
+      if (bal[0][0]) {
+        var turtle = '';
+        res.setHeader('Content-Type', 'text/turtle');
+        for (var i = 0; i < bal[0].length; i++) {
+          turtle += '<' + '' + '> <https://w3id.org/cc#wallet> <' + bal[0][i].wallet + '> .\n';
+        }
+        res.send(turtle);
+      }
+
+    }).catch(function(err){
+      console.log('Getting wallets Failed.', err);
+    });
+  });
+
+  app.get('/ledger', function (req, res) {
+    var ret = '';
+
+    var wallet   = req.query.wallet;
+
+    if (!wallet) {
+      wallet = config.wallet;
+    }
+
+    if (!wallet) {
+      res.send('wallet required');
+      return;
+    }
+
+    var walletsSql = 'SELECT DISTINCT source, amount from Ledger where wallet = :wallet';
+
+    sequelize.query(walletsSql,  { replacements: { wallet: wallet } }).then(function(bal) {
+      if (bal[0][0]) {
+        var turtle = '';
+        res.setHeader('Content-Type', 'text/turtle');
+        for (var i = 0; i < bal[0].length; i++) {
+          turtle += '<' + bal[0][i].source + '> <https://w3id.org/cc#amount> ' + bal[0][i].amount + ' .\n';
+        }
+        res.send(turtle);
+      } else {
+        res.send('no ledger found');
+      }
+    }).catch(function(err){
+      console.log('Getting wallets Failed.', err);
+      res.send('no ledger found');
+    });
   });
 
   app.get('/balance', function (req, res) {
@@ -69,7 +116,7 @@ function startServer(sequelize, config) {
       config.wallet = null;
     }
 
-    var balanceSql = 'Select amount from Ledger where source = :source and wallet = :wallet ;';
+    var balanceSql = 'Select source, amount from Ledger where source = :source and wallet = :wallet ;';
 
     sequelize.query(balanceSql,  { replacements: { wallet: config.wallet, source: source } }).then(function(bal) {
       return bal;
@@ -77,10 +124,13 @@ function startServer(sequelize, config) {
       console.log('Balance Failed.', err);
     }).then(function(bal) {
       if (bal[0][0]) {
-        console.log('balance for ' + source + ' : ' + bal[0][0].amount);
-        var amount = Math.round(  bal[0][0].amount * 10) / 10.0;
-        var turtle = '<' + source + '> <https://w3id.org/cc#amount> ' + amount + '.0 .\n';
+        //console.log('balance for ' + source + ' : ' + bal[0][0].amount);
+        //var amount = Math.round(  bal[0][0].amount * 10) / 10.0;
+        var turtle = '';
         res.setHeader('Content-Type', 'text/turtle');
+        for (var i = 0; i < bal[0].length; i++) {
+          turtle += '<' + bal[0][i].source + '> <https://w3id.org/cc#amount> ' + bal[0][i].amount + ' .\n';
+        }
         res.send(turtle);
       }
     });
@@ -110,9 +160,9 @@ function startServer(sequelize, config) {
 }
 
 /**
- * server function
- * @param  {Object} config [description]
- */
+* server function
+* @param  {Object} config [description]
+*/
 function server(config) {
   // vars
   var sequelize;
@@ -124,8 +174,8 @@ function server(config) {
 
 
 /**
- * version as a command
- */
+* version as a command
+*/
 function bin(argv) {
   // setup config
   var config = require('./dbconfig.js');
