@@ -1,10 +1,14 @@
 {
   "name": "webcredits",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "description": "webcredits",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha ./test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/melvincarvalho/webcredits.git"
   },
   "keywords": [
     "webcredits",
@@ -25,5 +29,9 @@
   "devDependencies": {
     "chai": "^3.3.0",
     "mocha": "^2.3.3"
+  },
+  "bin": {
+    "credit": "credit.js"
   }
+
 }
