@@ -7,7 +7,8 @@ CREATE TABLE Credit (
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   `context` TEXT,
   `description` TEXT,
-  `wallet` TEXT
+  `wallet` TEXT,
+   KEY `timestamp_index` (`timestamp`)
 );
 
 CREATE TABLE Ledger (
