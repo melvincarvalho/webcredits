@@ -1,4 +1,3 @@
-[![Stories in Ready](https://badge.waffle.io/melvincarvalho/webcredits.png?label=ready&title=Ready)](https://waffle.io/melvincarvalho/webcredits)
 webcredits
 ==========
 
